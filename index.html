@@ -215,6 +215,7 @@
 const STORAGE_KEY = 'ceramique_v2';
 let points = [];
 let chart = null;
+let tooltipHideTimer = null;
 let chronoRunning = false;
 let chronoStartMs = null;
 let chronoAccumMs = 0;
@@ -399,6 +400,20 @@ function renderMetrics() {
   document.getElementById('m-speed').textContent = spd !== null ? Math.round(spd) : '—';
 }
 
+Chart.register({
+  id: 'autoHideTooltip',
+  afterEvent(ch, args) {
+    const evt = args.event;
+    if (evt.type === 'click' || evt.type === 'touchstart') {
+      clearTimeout(tooltipHideTimer);
+      tooltipHideTimer = setTimeout(() => {
+        ch.tooltip.setActiveElements([], { x: 0, y: 0 });
+        ch.update('none');
+      }, 4000);
+    }
+  }
+});
+
 function gc() {
   const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
   return { grid: dark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.07)', tick: dark ? '#B4B2A9' : '#888780', orangeFill: dark ? 'rgba(216,90,48,0.18)' : 'rgba(216,90,48,0.10)' };
@@ -419,7 +434,8 @@ function renderChart() {
       options: {
         responsive: true, maintainAspectRatio: false, animation: { duration: 300 },
         interaction: { mode: 'index', intersect: false },
-        plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(26,26,24,0.92)', titleColor: '#fff', bodyColor: '#D3D1C7', padding: 10, cornerRadius: 8, callbacks: { label: ctx => ctx.datasetIndex === 0 ? '  Temp : ' + Math.round(ctx.parsed.y) + ' °C' : (ctx.parsed.y !== null ? '  Vitesse : ' + Math.round(ctx.parsed.y) + ' °C/h' : null) } } },
+        plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(26,26,24,0.92)', titleColor: '#fff', bodyColor: '#D3D1C7', padding: 10, cornerRadius: 8, callbacks: { label: ctx => ctx.datasetIndex === 0 ? '  Temp : ' + Math.round(ctx.parsed.y) + ' °C' : (ctx.parsed.y !== null ? '  Vitesse : ' + Math.round(ctx.parsed.y) + ' °C/h' : null) } },
+          autoHideTooltip: {} },
         scales: {
           x: { ticks: { color: c.tick, font: { size: 11 }, autoSkip: true, maxTicksLimit: 7, maxRotation: 35 }, grid: { color: c.grid } },
           yT: { type: 'linear', position: 'left', min: 0, max: 1400, ticks: { color: '#D85A30', font: { size: 11 }, stepSize: 200 }, grid: { color: c.grid } },
