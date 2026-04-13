@@ -550,45 +550,77 @@ function exportPDF() {
   setTimeout(() => {
     try {
       const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-      const W = 297, H = 210;
+      const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+      const W = 210, H = 297;
+      const M = 14;
       const now = new Date();
       const ds = now.toLocaleDateString('fr-FR') + ' ' + now.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
-      doc.setFillColor(245,244,241); doc.rect(0,0,W,H,'F');
-      doc.setFillColor(216,90,48); doc.rect(0,0,6,H,'F');
-      doc.setFontSize(20); doc.setFont(undefined,'bold'); doc.setTextColor(30,30,28);
-      doc.text('Courbe de cuisson Four Céramique', 16, 16);
-      doc.setFontSize(10); doc.setFont(undefined,'normal'); doc.setTextColor(95,94,90);
-      doc.text('Exporté le ' + ds, 16, 23);
+
+      doc.setFillColor(250,249,246); doc.rect(0,0,W,H,'F');
+      doc.setFillColor(216,90,48); doc.rect(0,0,5,H,'F');
+
+      doc.setFontSize(16); doc.setFont(undefined,'bold'); doc.setTextColor(30,30,28);
+      doc.text('Courbe de cuisson Four Céramique', M+3, 14);
+      doc.setFontSize(9); doc.setFont(undefined,'normal'); doc.setTextColor(95,94,90);
+      doc.text('Exporté le ' + ds, M+3, 20);
       const last = points[points.length-1]; const sl = calcSpeed(points.length-1);
-      doc.setTextColor(30,30,28);
-      doc.text(`${points.length} relevés  |  Durée : ${formatTime(last.time)}  |  Temp. finale : ${Math.round(last.temp)} °C  |  Vitesse finale : ${sl !== null ? Math.round(sl) + ' °C/h' : '—'}`, 16, 31);
-      doc.setDrawColor(216,90,48); doc.setLineWidth(0.4); doc.line(16,34,W-16,34);
+      doc.setTextColor(30,30,28); doc.setFontSize(9);
+      doc.text(`${points.length} relevés  |  Durée : ${formatTime(last.time)}  |  Temp. finale : ${Math.round(last.temp)} °C  |  Vitesse : ${sl !== null ? Math.round(sl) + ' °C/h' : '—'}`, M+3, 26);
+      doc.setDrawColor(216,90,48); doc.setLineWidth(0.4); doc.line(M+3,29,W-M,29);
+
       const gridColorBefore = chart.options.scales.x.grid.color;
       chart.options.scales.x.grid.color = 'rgba(0,0,0,0.75)';
       chart.options.scales.yT.grid.color = 'rgba(0,0,0,0.75)';
       chart.update('none');
-      doc.addImage(document.getElementById('myChart').toDataURL('image/png',0.95), 'PNG', 16, 38, 170, 100);
+      const chartW = W - 2*M - 3;
+      const chartH = Math.round(chartW * 0.42);
+      doc.addImage(document.getElementById('myChart').toDataURL('image/png',0.95), 'PNG', M+3, 32, chartW, chartH);
       chart.options.scales.x.grid.color = gridColorBefore;
       chart.options.scales.yT.grid.color = gridColorBefore;
       chart.update('none');
-      const lx = 196, ly = 38;
-      doc.setFillColor(216,90,48); doc.rect(lx,ly+1,6,3,'F'); doc.setFontSize(9); doc.setTextColor(50,50,48); doc.text('Température (°C)', lx+9, ly+4);
-      doc.setFillColor(24,95,165); doc.rect(lx,ly+8,6,3,'F'); doc.text('Vitesse (°C/h)', lx+9, ly+11);
-      const cols = [lx, lx+12, lx+33, lx+55, lx+72];
-      let ry = ly+22;
-      doc.setFontSize(8.5); doc.setTextColor(95,94,90);
-      ['#','Temps','T° (°C)','Vit.','Source'].forEach((h,i) => doc.text(h, cols[i], ry));
-      ry+=2; doc.setDrawColor(180,178,169); doc.setLineWidth(0.3); doc.line(lx,ry,lx+90,ry); ry+=5;
-      points.forEach((p,idx) => {
-        const spd = calcSpeed(idx);
-        const ss = spd !== null ? (spd>0?'+':'') + Math.round(spd) : '—';
-        doc.setTextColor(30,30,28); doc.text(String(idx+1), cols[0], ry); doc.text(formatTime(p.time), cols[1], ry); doc.text(String(Math.round(p.temp)), cols[2], ry);
-        if (spd!==null&&spd>0) doc.setTextColor(59,109,17); else if (spd!==null&&spd<0) doc.setTextColor(163,45,45); else doc.setTextColor(95,94,90);
-        doc.text(ss, cols[3], ry);
-        doc.setTextColor(24,95,165); doc.text(p.src==='chrono'?'chrono':'manuel', cols[4], ry);
-        ry+=6; if (ry>H-12) { doc.addPage(); ry=20; }
-      });
+
+      const legendY = 32 + chartH + 4;
+      doc.setFillColor(216,90,48); doc.rect(M+3, legendY, 5, 2.5, 'F');
+      doc.setFontSize(8); doc.setTextColor(50,50,48); doc.text('Température (°C)', M+10, legendY+2.2);
+      doc.setFillColor(24,95,165); doc.rect(M+45, legendY, 5, 2.5, 'F');
+      doc.text('Vitesse (°C/h)', M+52, legendY+2.2);
+
+      const tableY = legendY + 8;
+      const rowH = 6.5;
+      const availH = H - tableY - M;
+      const maxRows = Math.floor(availH / rowH) - 1;
+      const n = points.length;
+      const nCols = n <= maxRows ? 1 : n <= maxRows*2 ? 2 : 3;
+      const colWidth = (W - 2*M - 3) / nCols;
+      const colFields = [8, 16, 10, 12];
+      const colHeaders = ['#','Temps','T °C','Vit.'];
+      const perCol = Math.ceil(n / nCols);
+
+      for (let c = 0; c < nCols; c++) {
+        const cx = M + 3 + c * colWidth;
+        let fieldX = [cx, cx+8, cx+24, cx+36];
+        doc.setFontSize(8); doc.setFont(undefined,'bold'); doc.setTextColor(95,94,90);
+        colHeaders.forEach((h, fi) => doc.text(h, fieldX[fi], tableY));
+        doc.setDrawColor(150,148,144); doc.setLineWidth(0.25);
+        doc.line(cx, tableY+1.5, cx+colWidth-2, tableY+1.5);
+        doc.setFont(undefined,'normal');
+        for (let r = 0; r < perCol; r++) {
+          const idx = c * perCol + r;
+          if (idx >= n) break;
+          const p = points[idx];
+          const spd = calcSpeed(idx);
+          const ss = spd !== null ? (spd>0?'+':'') + Math.round(spd) : '—';
+          const ry = tableY + 1.5 + rowH + r * rowH;
+          doc.setTextColor(30,30,28); doc.setFontSize(8);
+          doc.text(String(idx+1), fieldX[0], ry);
+          doc.text(formatTime(p.time), fieldX[1], ry);
+          doc.text(String(Math.round(p.temp)), fieldX[2], ry);
+          if (spd!==null&&spd>0) doc.setTextColor(59,109,17);
+          else if (spd!==null&&spd<0) doc.setTextColor(163,45,45);
+          else doc.setTextColor(95,94,90);
+          doc.text(ss, fieldX[3], ry);
+        }
+      }
       doc.setFontSize(8); doc.setTextColor(160,158,154); doc.text('Courbe de cuisson Four Céramique', 16, H-8);
       doc.save('cuisson-' + now.toISOString().slice(0,10) + '.pdf');
       toast('PDF exporté !');
