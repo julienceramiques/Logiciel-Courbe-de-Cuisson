@@ -557,7 +557,6 @@ function exportPDF() {
       const ds = now.toLocaleDateString('fr-FR') + ' ' + now.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
 
       doc.setFillColor(250,249,246); doc.rect(0,0,W,H,'F');
-      doc.setFillColor(216,90,48); doc.rect(0,0,5,H,'F');
 
       doc.setFontSize(16); doc.setFont(undefined,'bold'); doc.setTextColor(30,30,28);
       doc.text('Courbe de cuisson Four Céramique', M+3, 14);
@@ -627,7 +626,6 @@ function exportPDF() {
           doc.text(ss, fieldX[3], ry);
         }
       }
-      doc.setFontSize(8); doc.setTextColor(160,158,154); doc.text('Courbe de cuisson Four Céramique', 16, H-8);
       doc.save('cuisson-' + now.toISOString().slice(0,10) + '.pdf');
       toast('PDF exporté !');
     } catch(e) { toast('Erreur : ' + e.message); }
