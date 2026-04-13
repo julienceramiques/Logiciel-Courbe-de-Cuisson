@@ -445,6 +445,7 @@ function captureManual() {
 }
 
 function deletePoint(i) {
+  if (!confirm('Supprimer ce relevé ?')) return;
   points.splice(i, 1);
   saveStorage(); render(); toast('Relevé supprimé');
 }
@@ -528,7 +529,7 @@ function renderChart() {
 function renderTable() {
   const wrap = document.getElementById('table-wrap');
   if (!points.length) { wrap.innerHTML = '<div class="no-data">Aucun relevé pour l\'instant</div>'; return; }
-  let html = '<div class="table-header"><span>#</span><span>Temps</span><span>T° °C</span><span>Vit.</span><span></span></div>';
+  let html = '<div class="table-header"><span>#</span><span>Temps</span><span>T °C</span><span>Vit.</span><span></span></div>';
   [...points].reverse().forEach((p, ri) => {
     const i = points.length - 1 - ri;
     const spd = calcSpeed(i);
