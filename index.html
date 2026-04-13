@@ -564,7 +564,14 @@ function exportPDF() {
       doc.setTextColor(30,30,28);
       doc.text(`${points.length} relevés  |  Durée : ${formatTime(last.time)}  |  Temp. finale : ${Math.round(last.temp)} °C  |  Vitesse finale : ${sl !== null ? Math.round(sl) + ' °C/h' : '—'}`, 16, 31);
       doc.setDrawColor(216,90,48); doc.setLineWidth(0.4); doc.line(16,34,W-16,34);
+      const gridColorBefore = chart.options.scales.x.grid.color;
+      chart.options.scales.x.grid.color = 'rgba(0,0,0,0.75)';
+      chart.options.scales.yT.grid.color = 'rgba(0,0,0,0.75)';
+      chart.update('none');
       doc.addImage(document.getElementById('myChart').toDataURL('image/png',0.95), 'PNG', 16, 38, 170, 100);
+      chart.options.scales.x.grid.color = gridColorBefore;
+      chart.options.scales.yT.grid.color = gridColorBefore;
+      chart.update('none');
       const lx = 196, ly = 38;
       doc.setFillColor(216,90,48); doc.rect(lx,ly+1,6,3,'F'); doc.setFontSize(9); doc.setTextColor(50,50,48); doc.text('Température (°C)', lx+9, ly+4);
       doc.setFillColor(24,95,165); doc.rect(lx,ly+8,6,3,'F'); doc.text('Vitesse (°C/h)', lx+9, ly+11);
