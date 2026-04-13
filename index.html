@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#ffffff">
-<title>Cuisson Céramique</title>
+<title>Courbe de cuisson Four Céramique</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
@@ -33,11 +33,13 @@
   html, body { background: var(--surface); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 16px; line-height: 1.5; min-height: 100vh; }
   body { padding: 0 0 40px 0; }
 
-  .top-bar { background: var(--card); border-bottom: 0.5px solid var(--border); padding: 14px 16px 12px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 10; }
-  .top-bar h1 { font-size: 17px; font-weight: 600; color: var(--text); letter-spacing: -0.3px; }
+  /* ── Titre centré ── */
+  .top-bar { background: var(--card); border-bottom: 0.5px solid var(--border); padding: 14px 16px 13px; text-align: center; position: sticky; top: 0; z-index: 10; }
+  .top-bar h1 { font-size: 16px; font-weight: 600; color: var(--text); letter-spacing: -0.2px; line-height: 1.3; }
 
   .section { padding: 0 14px; margin-top: 14px; }
 
+  /* ── 2 métriques côte à côte ── */
   .metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .metric { background: var(--card); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 12px 14px; }
   .metric-label { font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
@@ -46,56 +48,63 @@
   .metric.orange .metric-val { color: var(--orange); }
   .metric.blue .metric-val { color: var(--blue); }
 
+  /* ── Graphique ── */
   .chart-card { background: var(--card); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 14px 10px 10px; }
   .chart-legend { display: flex; gap: 16px; margin-bottom: 10px; padding: 0 4px; flex-wrap: wrap; }
   .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text2); }
   .legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
   .chart-wrap { position: relative; width: 100%; height: 220px; }
 
-  .input-card { background: var(--card); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 16px; }
+  /* ── Carte saisie ── */
+  .input-card { background: var(--card); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 14px; }
 
-  .mode-tabs { display: grid; grid-template-columns: 1fr 1fr; margin-bottom: 16px; border: 0.5px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; }
-  .mode-tab { padding: 10px 8px; font-size: 14px; font-weight: 500; text-align: center; cursor: pointer; background: var(--surface); color: var(--text2); border: none; font-family: inherit; -webkit-tap-highlight-color: transparent; }
-  .mode-tab.active { background: var(--card); color: var(--text); }
-  .mode-tab:first-child { border-right: 0.5px solid var(--border); }
+  /* ── Grille 2 colonnes chrono | manuel ── */
+  .two-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
 
-  .chrono-block { display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 4px 0 8px; }
-  .chrono-display { font-size: 52px; font-weight: 700; letter-spacing: -2px; color: var(--text); font-variant-numeric: tabular-nums; line-height: 1; }
+  /* colonne générique */
+  .col-block { display: flex; flex-direction: column; gap: 8px; }
+  .col-title { font-size: 11px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.05em; text-align: center; margin-bottom: 2px; }
+
+  /* séparateur vertical */
+  .col-sep { width: 0.5px; background: var(--border); align-self: stretch; }
+
+  /* ── Chrono ── */
+  .chrono-display { font-size: 28px; font-weight: 700; letter-spacing: -1px; color: var(--text); font-variant-numeric: tabular-nums; line-height: 1; text-align: center; }
   .chrono-display.running { color: var(--orange); }
   .chrono-display.paused { color: var(--amber); }
-  .chrono-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
-  .btn-chrono-start { background: var(--orange); color: #fff; border: none; border-radius: var(--radius-sm); padding: 14px; font-size: 16px; font-weight: 600; cursor: pointer; font-family: inherit; -webkit-tap-highlight-color: transparent; }
+  .btn-chrono-start { background: var(--orange); color: #fff; border: none; border-radius: var(--radius-sm); padding: 11px 6px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; -webkit-tap-highlight-color: transparent; width: 100%; }
   .btn-chrono-start:active { opacity: 0.85; transform: scale(0.98); }
   .btn-chrono-start.running { background: var(--amber); }
-  .btn-chrono-reset { background: var(--surface); color: var(--text2); border: 0.5px solid var(--border); border-radius: var(--radius-sm); padding: 14px; font-size: 16px; font-weight: 500; cursor: pointer; font-family: inherit; -webkit-tap-highlight-color: transparent; }
+  .btn-chrono-reset { background: var(--surface); color: var(--text2); border: 0.5px solid var(--border); border-radius: var(--radius-sm); padding: 11px 6px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; -webkit-tap-highlight-color: transparent; width: 100%; }
   .btn-chrono-reset:active { opacity: 0.7; }
-  .chrono-sep { width: 100%; height: 0.5px; background: var(--border); }
-  .chrono-temp-label { font-size: 12px; color: var(--text2); font-weight: 500; text-align: center; width: 100%; }
-  .chrono-temp-input { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 14px 10px; font-size: 28px; color: var(--text); width: 100%; font-family: inherit; -webkit-appearance: none; appearance: none; outline: none; text-align: center; font-weight: 600; }
-  .chrono-temp-input:focus { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(216,90,48,0.15); }
-  .chrono-temp-input::placeholder { font-size: 18px; font-weight: 400; opacity: 0.4; }
-  .btn-capture { width: 100%; background: var(--orange); color: #fff; border: none; border-radius: var(--radius-sm); padding: 16px; font-size: 17px; font-weight: 700; cursor: pointer; font-family: inherit; -webkit-tap-highlight-color: transparent; }
+  .chrono-btns-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+
+  /* ── Champs ── */
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .field label { font-size: 11px; color: var(--text2); font-weight: 500; text-align: center; }
+  .field input { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 6px; font-size: 18px; color: var(--text); width: 100%; font-family: inherit; -webkit-appearance: none; appearance: none; outline: none; text-align: center; font-weight: 600; }
+  .field input:focus { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(216,90,48,0.15); }
+  .field input::placeholder { font-size: 13px; font-weight: 400; opacity: 0.4; }
+
+  /* h+min côte à côte */
+  .hmin-row { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+
+  /* ── Bouton enregistrer pleine largeur ── */
+  .btn-capture { width: 100%; background: var(--orange); color: #fff; border: none; border-radius: var(--radius-sm); padding: 15px; font-size: 16px; font-weight: 700; cursor: pointer; font-family: inherit; -webkit-tap-highlight-color: transparent; }
   .btn-capture:active { opacity: 0.85; transform: scale(0.98); }
   .btn-capture:disabled { opacity: 0.32; }
 
-  .manual-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
-  .field { display: flex; flex-direction: column; gap: 5px; }
-  .field label { font-size: 12px; color: var(--text2); font-weight: 500; }
-  .field input { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 10px; font-size: 18px; color: var(--text); width: 100%; font-family: inherit; -webkit-appearance: none; appearance: none; outline: none; text-align: center; font-weight: 500; }
-  .field input:focus { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(216,90,48,0.15); }
-  .field input::placeholder { color: var(--text2); opacity: 0.5; font-size: 14px; font-weight: 400; }
-  .btn-add { width: 100%; background: var(--orange); color: #fff; border: none; border-radius: var(--radius-sm); padding: 15px; font-size: 16px; font-weight: 600; cursor: pointer; font-family: inherit; -webkit-tap-highlight-color: transparent; }
-  .btn-add:active { opacity: 0.85; transform: scale(0.98); }
-
+  /* ── Boutons bas ── */
   .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
   .btn-secondary { background: var(--surface); color: var(--text); border: 0.5px solid var(--border); border-radius: var(--radius-sm); padding: 12px; font-size: 14px; font-weight: 500; cursor: pointer; font-family: inherit; -webkit-tap-highlight-color: transparent; text-align: center; }
   .btn-secondary:active { opacity: 0.7; }
   .btn-pdf { background: var(--green-bg); color: var(--green); border: 0.5px solid rgba(59,109,17,0.25); }
 
+  /* ── Tableau ── */
   .table-card { background: var(--card); border: 0.5px solid var(--border); border-radius: var(--radius); overflow: hidden; }
-  .table-header { display: grid; grid-template-columns: 26px 1fr 52px 52px 32px; gap: 0; padding: 9px 10px; background: var(--surface); border-bottom: 0.5px solid var(--border); }
+  .table-header { display: grid; grid-template-columns: 26px 1fr 52px 52px 32px; padding: 9px 10px; background: var(--surface); border-bottom: 0.5px solid var(--border); }
   .table-header span { font-size: 11px; color: var(--text2); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
-  .table-row { display: grid; grid-template-columns: 26px 1fr 52px 52px 32px; gap: 0; padding: 11px 10px; border-bottom: 0.5px solid var(--border); align-items: center; }
+  .table-row { display: grid; grid-template-columns: 26px 1fr 52px 52px 32px; padding: 11px 10px; border-bottom: 0.5px solid var(--border); align-items: center; }
   .table-row:last-child { border-bottom: none; }
   .table-row span { font-size: 14px; color: var(--text); }
   .num { color: var(--text2); font-size: 12px; }
@@ -107,7 +116,7 @@
   .btn-del:active { color: var(--red); }
   .no-data { padding: 28px 16px; text-align: center; color: var(--text2); font-size: 14px; }
 
-  .divider { height: 0.5px; background: var(--border); margin: 14px 0 0; }
+  .divider { height: 0.5px; background: var(--border); margin: 12px 0 0; }
 
   .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #1a1a18; color: #fff; border-radius: 20px; padding: 10px 20px; font-size: 14px; font-weight: 500; opacity: 0; transition: opacity 0.25s; z-index: 100; white-space: nowrap; pointer-events: none; }
   .toast.show { opacity: 1; }
@@ -116,9 +125,10 @@
 <body>
 
 <div class="top-bar">
-  <h1>Cuisson céramique 🔥</h1>
+  <h1>Courbe de cuisson Four Céramique 🔥</h1>
 </div>
 
+<!-- 2 métriques : température + vitesse -->
 <div class="section">
   <div class="metrics">
     <div class="metric orange">
@@ -126,24 +136,15 @@
       <div class="metric-val" id="m-temp">—</div>
       <div class="metric-unit">°C dernier relevé</div>
     </div>
-    <div class="metric">
-      <div class="metric-label">Chrono</div>
-      <div class="metric-val" id="m-chrono">0:00</div>
-      <div class="metric-unit" id="m-chrono-lbl">en attente</div>
-    </div>
     <div class="metric blue">
       <div class="metric-label">Vitesse</div>
       <div class="metric-val" id="m-speed">—</div>
       <div class="metric-unit">°C/h</div>
     </div>
-    <div class="metric">
-      <div class="metric-label">Relevés</div>
-      <div class="metric-val" id="m-count">0</div>
-      <div class="metric-unit">enregistrés</div>
-    </div>
   </div>
 </div>
 
+<!-- Graphique -->
 <div class="section">
   <div class="chart-card">
     <div class="chart-legend">
@@ -151,46 +152,60 @@
       <div class="legend-item"><div class="legend-dot" style="background:#185FA5;opacity:0.7"></div>Vitesse (°C/h)</div>
     </div>
     <div class="chart-wrap">
-      <canvas id="myChart" role="img" aria-label="Courbe de cuisson céramique"></canvas>
+      <canvas id="myChart" role="img" aria-label="Courbe de cuisson four céramique"></canvas>
     </div>
   </div>
 </div>
 
+<!-- Saisie : 2 colonnes côte à côte -->
 <div class="section">
   <div class="input-card">
 
-    <div class="mode-tabs">
-      <button class="mode-tab active" id="tab-chrono" onclick="switchMode('chrono')">⏱ Chronomètre</button>
-      <button class="mode-tab" id="tab-manual" onclick="switchMode('manual')">✏️ Saisie manuelle</button>
-    </div>
+    <div class="two-cols">
 
-    <div id="panel-chrono">
-      <div class="chrono-block">
+      <!-- Colonne gauche : chronomètre -->
+      <div class="col-block">
+        <div class="col-title">Chronomètre</div>
         <div class="chrono-display" id="chrono-disp">0:00:00</div>
-        <div class="chrono-btns">
+        <div class="chrono-btns-row">
           <button class="btn-chrono-start" id="btn-start" onclick="toggleChrono()">Démarrer</button>
-          <button class="btn-chrono-reset" onclick="resetChrono()">Réinitialiser</button>
+          <button class="btn-chrono-reset" onclick="resetChrono()">Réinit.</button>
         </div>
-        <div class="chrono-sep"></div>
-        <div class="chrono-temp-label">Saisir la température puis appuyer sur Enregistrer</div>
-        <input type="number" class="chrono-temp-input" id="chrono-temp" inputmode="numeric" placeholder="Température °C" min="0" max="1400" autocomplete="off" />
-        <button class="btn-capture" id="btn-capture" onclick="capturePoint()" disabled>Enregistrer ce relevé</button>
+        <div class="field">
+          <label for="chrono-temp">Température °C</label>
+          <input type="number" id="chrono-temp" inputmode="numeric" placeholder="ex : 850" min="0" max="1400" autocomplete="off" />
+        </div>
       </div>
+
+      <!-- Séparateur -->
+      <div class="col-sep"></div>
+
+      <!-- Colonne droite : saisie manuelle -->
+      <div class="col-block">
+        <div class="col-title">Saisie manuelle</div>
+        <div class="field">
+          <label>Temps</label>
+          <div class="hmin-row">
+            <div class="field">
+              <label for="inp-h">h</label>
+              <input type="number" id="inp-h" inputmode="numeric" placeholder="0" min="0" max="24" autocomplete="off" />
+            </div>
+            <div class="field">
+              <label for="inp-m">min</label>
+              <input type="number" id="inp-m" inputmode="numeric" placeholder="00" min="0" max="59" autocomplete="off" />
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <label for="inp-temp">Température °C</label>
+          <input type="number" id="inp-temp" inputmode="numeric" placeholder="ex : 450" min="0" max="1400" autocomplete="off" />
+        </div>
+      </div>
+
     </div>
 
-    <div id="panel-manual" style="display:none">
-      <div class="manual-fields">
-        <div class="field">
-          <label for="inp-time">Temps (h:mm ou 1.5)</label>
-          <input type="text" id="inp-time" inputmode="decimal" placeholder="0:00" autocomplete="off" autocorrect="off" spellcheck="false" />
-        </div>
-        <div class="field">
-          <label for="inp-temp">Température (°C)</label>
-          <input type="number" id="inp-temp" inputmode="numeric" placeholder="0" min="0" max="1400" autocomplete="off" />
-        </div>
-      </div>
-      <button class="btn-add" onclick="addManualPoint()">Enregistrer le relevé</button>
-    </div>
+    <!-- Bouton pleine largeur -->
+    <button class="btn-capture" id="btn-capture" onclick="enregistrer()" disabled>Enregistrer le relevé</button>
 
     <div class="divider"></div>
     <div class="btn-row">
@@ -201,6 +216,7 @@
   </div>
 </div>
 
+<!-- Tableau des relevés -->
 <div class="section" style="margin-top:14px">
   <div class="table-card" id="table-wrap">
     <div class="no-data">Aucun relevé pour l'instant</div>
@@ -212,7 +228,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
-const STORAGE_KEY = 'ceramique_v2';
+const STORAGE_KEY = 'ceramique_v3';
 let points = [];
 let chart = null;
 let tooltipHideTimer = null;
@@ -238,10 +254,7 @@ function saveStorage() {
   } catch(e) {}
 }
 
-function elapsedMs() {
-  return chronoRunning ? chronoAccumMs + (Date.now() - chronoStartMs) : chronoAccumMs;
-}
-
+function elapsedMs() { return chronoRunning ? chronoAccumMs + (Date.now() - chronoStartMs) : chronoAccumMs; }
 function elapsedH() { return elapsedMs() / 3600000; }
 
 function fmtMs(ms) {
@@ -258,17 +271,6 @@ function formatTime(h) {
   return hr + 'h' + String(mn).padStart(2,'0');
 }
 
-function parseTime(str) {
-  str = (str || '').trim();
-  if (str.includes(':')) {
-    const p = str.split(':');
-    const h = parseFloat(p[0]), m = parseFloat(p[1] || '0');
-    return (isNaN(h) || isNaN(m)) ? null : h + m / 60;
-  }
-  const v = parseFloat(str.replace(',', '.'));
-  return isNaN(v) ? null : v;
-}
-
 function calcSpeed(i) {
   if (i === 0 || i >= points.length) return null;
   const dt = points[i].time - points[i-1].time;
@@ -283,6 +285,7 @@ function toast(msg) {
   el._t = setTimeout(() => el.classList.remove('show'), 2400);
 }
 
+/* ── Chrono ── */
 function toggleChrono() {
   if (chronoRunning) {
     chronoAccumMs += Date.now() - chronoStartMs;
@@ -292,54 +295,68 @@ function toggleChrono() {
     document.getElementById('btn-start').textContent = 'Reprendre';
     document.getElementById('btn-start').classList.remove('running');
     document.getElementById('chrono-disp').className = 'chrono-display paused';
-    document.getElementById('m-chrono-lbl').textContent = 'en pause';
   } else {
     chronoStartMs = Date.now();
     chronoRunning = true;
     document.getElementById('btn-start').textContent = 'Pause';
     document.getElementById('btn-start').classList.add('running');
     document.getElementById('chrono-disp').className = 'chrono-display running';
-    document.getElementById('m-chrono-lbl').textContent = 'en cours';
     tick();
   }
-  updateCaptureBtn();
+  updateBtn();
   saveStorage();
 }
 
 function tick() {
   if (!chronoRunning) return;
-  const ms = elapsedMs();
-  document.getElementById('chrono-disp').textContent = fmtMs(ms);
-  const h = Math.floor(ms / 3600000);
-  const m = Math.floor((ms % 3600000) / 60000);
-  document.getElementById('m-chrono').textContent = h + ':' + String(m).padStart(2,'0');
+  document.getElementById('chrono-disp').textContent = fmtMs(elapsedMs());
   rafId = requestAnimationFrame(tick);
 }
 
 function resetChrono() {
-  if (chronoRunning || chronoAccumMs > 0) {
-    if (!confirm('Réinitialiser le chronomètre ? Les relevés ne seront pas effacés.')) return;
-  }
+  if ((chronoRunning || chronoAccumMs > 0) && !confirm('Réinitialiser le chronomètre ? Les relevés ne seront pas effacés.')) return;
   chronoRunning = false; chronoStartMs = null; chronoAccumMs = 0;
   if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
   document.getElementById('chrono-disp').textContent = '0:00:00';
   document.getElementById('chrono-disp').className = 'chrono-display';
   document.getElementById('btn-start').textContent = 'Démarrer';
   document.getElementById('btn-start').classList.remove('running');
-  document.getElementById('m-chrono').textContent = '0:00';
-  document.getElementById('m-chrono-lbl').textContent = 'en attente';
-  updateCaptureBtn();
+  updateBtn();
   saveStorage();
   toast('Chronomètre réinitialisé');
 }
 
-function updateCaptureBtn() {
-  const hasTemp = document.getElementById('chrono-temp').value !== '';
-  const hasTime = elapsedMs() >= 100;
-  document.getElementById('btn-capture').disabled = !(hasTemp && hasTime);
+/* ── Activation bouton Enregistrer ── */
+function updateBtn() {
+  const chronoHasTemp = document.getElementById('chrono-temp').value !== '';
+  const chronoReady = chronoHasTemp && elapsedMs() >= 100;
+  const h = document.getElementById('inp-h').value;
+  const m = document.getElementById('inp-m').value;
+  const t = document.getElementById('inp-temp').value;
+  const manualReady = (h !== '' || m !== '') && t !== '';
+  document.getElementById('btn-capture').disabled = !(chronoReady || manualReady);
 }
 
-function capturePoint() {
+/* ── Enregistrer : détermine la source active ── */
+function enregistrer() {
+  const chronoTemp = document.getElementById('chrono-temp').value;
+  const manH = document.getElementById('inp-h').value;
+  const manM = document.getElementById('inp-m').value;
+  const manTemp = document.getElementById('inp-temp').value;
+
+  const chronoReady = chronoTemp !== '' && elapsedMs() >= 100;
+  const manualReady = (manH !== '' || manM !== '') && manTemp !== '';
+
+  if (chronoReady) {
+    captureFromChrono();
+  } else if (manualReady) {
+    captureManual();
+  } else {
+    toast('Remplissez les champs d\'une des deux colonnes');
+  }
+}
+
+function captureFromChrono() {
   const temp = parseFloat(document.getElementById('chrono-temp').value);
   if (isNaN(temp) || temp < 0 || temp > 1400) { toast('Température invalide (0–1400 °C)'); return; }
   const t = elapsedH();
@@ -349,25 +366,29 @@ function capturePoint() {
   points.sort((a, b) => a.time - b.time);
   saveStorage();
   document.getElementById('chrono-temp').value = '';
-  updateCaptureBtn();
+  updateBtn();
   render();
-  toast('Relevé capturé — ' + formatTime(t) + ' → ' + Math.round(temp) + ' °C');
+  toast('Relevé chrono — ' + formatTime(t) + ' → ' + Math.round(temp) + ' °C');
 }
 
-function addManualPoint() {
-  const tStr = document.getElementById('inp-time').value;
+function captureManual() {
+  const h = parseFloat(document.getElementById('inp-h').value) || 0;
+  const m = parseFloat(document.getElementById('inp-m').value) || 0;
   const temp = parseFloat(document.getElementById('inp-temp').value);
-  const t = parseTime(tStr);
-  if (t === null || isNaN(t) || t < 0) { toast('Temps invalide (ex : 1:30 ou 1.5)'); return; }
   if (isNaN(temp) || temp < 0 || temp > 1400) { toast('Température invalide (0–1400 °C)'); return; }
+  if (m < 0 || m > 59) { toast('Les minutes doivent être entre 0 et 59'); return; }
+  const t = h + m / 60;
+  if (t < 0) { toast('Temps invalide'); return; }
   if (points.find(p => Math.abs(p.time - t) < 0.001)) { toast('Un relevé existe déjà à ce temps'); return; }
   points.push({ time: t, temp, src: 'manual' });
   points.sort((a, b) => a.time - b.time);
   saveStorage();
-  document.getElementById('inp-time').value = '';
+  document.getElementById('inp-h').value = '';
+  document.getElementById('inp-m').value = '';
   document.getElementById('inp-temp').value = '';
+  updateBtn();
   render();
-  toast('Relevé ajouté — ' + formatTime(t) + ' → ' + Math.round(temp) + ' °C');
+  toast('Relevé manuel — ' + formatTime(t) + ' → ' + Math.round(temp) + ' °C');
 }
 
 function deletePoint(i) {
@@ -381,23 +402,25 @@ function clearAll() {
   points = []; saveStorage(); render(); toast('Données effacées');
 }
 
-function switchMode(m) {
-  document.getElementById('tab-chrono').classList.toggle('active', m === 'chrono');
-  document.getElementById('tab-manual').classList.toggle('active', m === 'manual');
-  document.getElementById('panel-chrono').style.display = m === 'chrono' ? '' : 'none';
-  document.getElementById('panel-manual').style.display = m === 'manual' ? '' : 'none';
-}
-
+/* ── Rendu ── */
 function render() { renderMetrics(); renderChart(); renderTable(); }
 
 function renderMetrics() {
   const n = points.length;
-  document.getElementById('m-count').textContent = n;
-  if (!n) { document.getElementById('m-temp').textContent = '—'; document.getElementById('m-speed').textContent = '—'; return; }
+  if (!n) {
+    document.getElementById('m-temp').textContent = '—';
+    document.getElementById('m-speed').textContent = '—';
+    return;
+  }
   const last = points[n-1];
   document.getElementById('m-temp').textContent = Math.round(last.temp);
   const spd = calcSpeed(n-1);
   document.getElementById('m-speed').textContent = spd !== null ? Math.round(spd) : '—';
+}
+
+function gc() {
+  const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  return { grid: dark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.07)', tick: dark ? '#B4B2A9' : '#888780', orangeFill: dark ? 'rgba(216,90,48,0.18)' : 'rgba(216,90,48,0.10)' };
 }
 
 Chart.register({
@@ -414,14 +437,9 @@ Chart.register({
   }
 });
 
-function gc() {
-  const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  return { grid: dark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.07)', tick: dark ? '#B4B2A9' : '#888780', orangeFill: dark ? 'rgba(216,90,48,0.18)' : 'rgba(216,90,48,0.10)' };
-}
-
 function renderChart() {
   const labels = points.map(p => formatTime(p.time));
-  const temps = points.map(p => p.temp);
+  const temps  = points.map(p => p.temp);
   const speeds = points.map((p,i) => { const s = calcSpeed(i); return s !== null ? +s.toFixed(1) : null; });
   const c = gc();
   if (!chart) {
@@ -434,8 +452,11 @@ function renderChart() {
       options: {
         responsive: true, maintainAspectRatio: false, animation: { duration: 300 },
         interaction: { mode: 'index', intersect: false },
-        plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(26,26,24,0.92)', titleColor: '#fff', bodyColor: '#D3D1C7', padding: 10, cornerRadius: 8, callbacks: { label: ctx => ctx.datasetIndex === 0 ? '  Temp : ' + Math.round(ctx.parsed.y) + ' °C' : (ctx.parsed.y !== null ? '  Vitesse : ' + Math.round(ctx.parsed.y) + ' °C/h' : null) } },
-          autoHideTooltip: {} },
+        plugins: {
+          legend: { display: false },
+          tooltip: { backgroundColor: 'rgba(26,26,24,0.92)', titleColor: '#fff', bodyColor: '#D3D1C7', padding: 10, cornerRadius: 8, callbacks: { label: ctx => ctx.datasetIndex === 0 ? '  Temp : ' + Math.round(ctx.parsed.y) + ' °C' : (ctx.parsed.y !== null ? '  Vitesse : ' + Math.round(ctx.parsed.y) + ' °C/h' : null) } },
+          autoHideTooltip: {}
+        },
         scales: {
           x: { ticks: { color: c.tick, font: { size: 11 }, autoSkip: true, maxTicksLimit: 7, maxRotation: 35 }, grid: { color: c.grid } },
           yT: { type: 'linear', position: 'left', min: 0, max: 1400, ticks: { color: '#D85A30', font: { size: 11 }, stepSize: 200 }, grid: { color: c.grid } },
@@ -482,7 +503,7 @@ function exportPDF() {
       doc.setFillColor(245,244,241); doc.rect(0,0,W,H,'F');
       doc.setFillColor(216,90,48); doc.rect(0,0,6,H,'F');
       doc.setFontSize(20); doc.setFont(undefined,'bold'); doc.setTextColor(30,30,28);
-      doc.text('Courbe de cuisson céramique', 16, 16);
+      doc.text('Courbe de cuisson Four Céramique', 16, 16);
       doc.setFontSize(10); doc.setFont(undefined,'normal'); doc.setTextColor(95,94,90);
       doc.text('Exporté le ' + ds, 16, 23);
       const last = points[points.length-1]; const sl = calcSpeed(points.length-1);
@@ -507,33 +528,34 @@ function exportPDF() {
         doc.setTextColor(24,95,165); doc.text(p.src==='chrono'?'chrono':'manuel', cols[4], ry);
         ry+=6; if (ry>H-12) { doc.addPage(); ry=20; }
       });
-      doc.setFontSize(8); doc.setTextColor(160,158,154); doc.text('Suivi de cuisson céramique', 16, H-8);
+      doc.setFontSize(8); doc.setTextColor(160,158,154); doc.text('Courbe de cuisson Four Céramique', 16, H-8);
       doc.save('cuisson-' + now.toISOString().slice(0,10) + '.pdf');
       toast('PDF exporté !');
     } catch(e) { toast('Erreur : ' + e.message); }
   }, 100);
 }
 
-document.getElementById('inp-time').addEventListener('keydown', e => { if (e.key==='Enter') { e.preventDefault(); document.getElementById('inp-temp').focus(); } });
-document.getElementById('inp-temp').addEventListener('keydown', e => { if (e.key==='Enter') { e.preventDefault(); addManualPoint(); } });
-document.getElementById('inp-time').addEventListener('blur', function() { const v = this.value.trim(); if (!v) return; const t = parseTime(v); if (t!==null) this.value = formatTime(t); });
-document.getElementById('chrono-temp').addEventListener('input', updateCaptureBtn);
-document.getElementById('chrono-temp').addEventListener('keydown', e => { if (e.key==='Enter') { e.preventDefault(); capturePoint(); } });
+/* ── Listeners ── */
+['chrono-temp','inp-h','inp-m','inp-temp'].forEach(id => {
+  document.getElementById(id).addEventListener('input', updateBtn);
+});
+document.getElementById('chrono-temp').addEventListener('keydown', e => { if (e.key==='Enter') { e.preventDefault(); enregistrer(); } });
+document.getElementById('inp-temp').addEventListener('keydown', e => { if (e.key==='Enter') { e.preventDefault(); enregistrer(); } });
+document.getElementById('inp-h').addEventListener('keydown', e => { if (e.key==='Enter') { e.preventDefault(); document.getElementById('inp-m').focus(); } });
+document.getElementById('inp-m').addEventListener('keydown', e => { if (e.key==='Enter') { e.preventDefault(); document.getElementById('inp-temp').focus(); } });
 
+/* ── Init ── */
 loadStorage();
 
 if (chronoRunning) {
   document.getElementById('btn-start').textContent = 'Pause';
   document.getElementById('btn-start').classList.add('running');
   document.getElementById('chrono-disp').className = 'chrono-display running';
-  document.getElementById('m-chrono-lbl').textContent = 'en cours';
   tick();
 } else if (chronoAccumMs > 0) {
   document.getElementById('chrono-disp').textContent = fmtMs(chronoAccumMs);
   document.getElementById('chrono-disp').className = 'chrono-display paused';
   document.getElementById('btn-start').textContent = 'Reprendre';
-  document.getElementById('m-chrono').textContent = formatTime(chronoAccumMs / 3600000);
-  document.getElementById('m-chrono-lbl').textContent = 'en pause';
 }
 
 render();
