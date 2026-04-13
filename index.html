@@ -571,12 +571,18 @@ function exportPDF() {
       const gridColorBefore = chart.options.scales.x.grid.color;
       chart.options.scales.x.grid.color = 'rgba(0,0,0,0.75)';
       chart.options.scales.yT.grid.color = 'rgba(0,0,0,0.75)';
+      chart.options.scales.x.ticks.font.size = 7;
+      chart.options.scales.yT.ticks.font.size = 7;
+      chart.options.scales.yS.ticks.font.size = 7;
       chart.update('none');
       const chartW = W - 2*M - 3;
       const chartH = Math.round(chartW * 0.42);
       doc.addImage(document.getElementById('myChart').toDataURL('image/png',0.95), 'PNG', M+3, 32, chartW, chartH);
       chart.options.scales.x.grid.color = gridColorBefore;
       chart.options.scales.yT.grid.color = gridColorBefore;
+      chart.options.scales.x.ticks.font.size = 11;
+      chart.options.scales.yT.ticks.font.size = 11;
+      chart.options.scales.yS.ticks.font.size = 11;
       chart.update('none');
 
       const legendY = 32 + chartH + 4;
@@ -586,7 +592,7 @@ function exportPDF() {
       doc.text('Vitesse (°C/h)', M+52, legendY+2.2);
 
       const tableY = legendY + 8;
-      const rowH = 6.5;
+      const rowH = 5.2;
       const availH = H - tableY - M;
       const maxRows = Math.floor(availH / rowH) - 1;
       const n = points.length;
@@ -599,7 +605,7 @@ function exportPDF() {
       for (let c = 0; c < nCols; c++) {
         const cx = M + 3 + c * colWidth;
         let fieldX = [cx, cx+8, cx+24, cx+36];
-        doc.setFontSize(8); doc.setFont(undefined,'bold'); doc.setTextColor(95,94,90);
+        doc.setFontSize(6.5); doc.setFont(undefined,'bold'); doc.setTextColor(95,94,90);
         colHeaders.forEach((h, fi) => doc.text(h, fieldX[fi], tableY));
         doc.setDrawColor(150,148,144); doc.setLineWidth(0.25);
         doc.line(cx, tableY+1.5, cx+colWidth-2, tableY+1.5);
@@ -611,7 +617,7 @@ function exportPDF() {
           const spd = calcSpeed(idx);
           const ss = spd !== null ? (spd>0?'+':'') + Math.round(spd) : '—';
           const ry = tableY + 1.5 + rowH + r * rowH;
-          doc.setTextColor(30,30,28); doc.setFontSize(8);
+          doc.setTextColor(30,30,28); doc.setFontSize(6.5);
           doc.text(String(idx+1), fieldX[0], ry);
           doc.text(formatTime(p.time), fieldX[1], ry);
           doc.text(String(Math.round(p.temp)), fieldX[2], ry);
