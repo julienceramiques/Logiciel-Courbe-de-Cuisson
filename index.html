@@ -59,7 +59,7 @@
   .input-card { background: var(--card); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 14px; }
 
   /* ── Grille 2 colonnes chrono | manuel ── */
-  .two-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+  .two-cols { display: grid; grid-template-columns: 1fr 1px 1fr; gap: 10px; margin-bottom: 12px; }
 
   /* colonne générique */
   .col-block { display: flex; flex-direction: column; gap: 8px; }
@@ -77,7 +77,7 @@
   .btn-chrono-start.running { background: var(--amber); }
   .btn-chrono-reset { background: var(--surface); color: var(--text2); border: 0.5px solid var(--border); border-radius: var(--radius-sm); padding: 11px 6px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; -webkit-tap-highlight-color: transparent; width: 100%; }
   .btn-chrono-reset:active { opacity: 0.7; }
-  .chrono-btns-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .chrono-btns-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; }
 
   /* ── Champs ── */
   .field { display: flex; flex-direction: column; gap: 4px; }
@@ -116,6 +116,16 @@
   .btn-del:active { color: var(--red); }
   .no-data { padding: 28px 16px; text-align: center; color: var(--text2); font-size: 14px; }
 
+  .chrono-set-panel { overflow: hidden; max-height: 0; opacity: 0; transition: max-height 0.25s ease, opacity 0.2s ease, margin 0.25s ease; margin-top: 0; }
+  .chrono-set-panel.open { max-height: 60px; opacity: 1; margin-top: 8px; }
+  .chrono-set-fields { display: flex; align-items: center; gap: 5px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 6px 8px; }
+  .chrono-set-fields input { background: transparent; border: none; outline: none; padding: 4px 2px; font-size: 17px; color: var(--text); font-family: inherit; -webkit-appearance: none; appearance: none; text-align: center; font-weight: 600; width: 100%; }
+  .chrono-set-fields input::placeholder { font-size: 12px; font-weight: 400; opacity: 0.4; }
+  .set-sep { font-size: 16px; font-weight: 700; color: var(--text2); flex-shrink: 0; }
+  .btn-chrono-set { background: var(--blue-bg); color: var(--blue); border: 0.5px solid rgba(24,95,165,0.25); border-radius: var(--radius-sm); padding: 9px 6px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; -webkit-tap-highlight-color: transparent; white-space: nowrap; }
+  .btn-chrono-set:active { opacity: 0.75; }
+  .btn-set-ok { background: var(--orange); color: #fff; border: none; border-radius: var(--radius-sm); padding: 6px 10px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; -webkit-tap-highlight-color: transparent; flex-shrink: 0; }
+  .btn-set-ok:active { opacity: 0.8; }
   .divider { height: 0.5px; background: var(--border); margin: 12px 0 0; }
 
   .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #1a1a18; color: #fff; border-radius: 20px; padding: 10px 20px; font-size: 14px; font-weight: 500; opacity: 0; transition: opacity 0.25s; z-index: 100; white-space: nowrap; pointer-events: none; }
@@ -169,7 +179,16 @@
         <div class="chrono-display" id="chrono-disp">0:00:00</div>
         <div class="chrono-btns-row">
           <button class="btn-chrono-start" id="btn-start" onclick="toggleChrono()">Démarrer</button>
+          <button class="btn-chrono-set" id="btn-definir" onclick="toggleDefinirPanel()">Définir</button>
           <button class="btn-chrono-reset" onclick="resetChrono()">Réinit.</button>
+        </div>
+        <div class="chrono-set-panel" id="set-panel">
+          <div class="chrono-set-fields">
+            <input type="number" id="set-h" inputmode="numeric" placeholder="h" min="0" max="24" autocomplete="off" />
+            <span class="set-sep">:</span>
+            <input type="number" id="set-m" inputmode="numeric" placeholder="mm" min="0" max="59" autocomplete="off" />
+            <button class="btn-set-ok" onclick="setChronoTime()">OK</button>
+          </div>
         </div>
         <div class="field">
           <label for="chrono-temp">Température °C</label>
@@ -324,6 +343,40 @@ function resetChrono() {
   updateBtn();
   saveStorage();
   toast('Chronomètre réinitialisé');
+}
+
+function toggleDefinirPanel() {
+  const panel = document.getElementById('set-panel');
+  panel.classList.toggle('open');
+  if (panel.classList.contains('open')) {
+    setTimeout(() => document.getElementById('set-h').focus(), 50);
+  }
+}
+
+function setChronoTime() {
+  const h = parseFloat(document.getElementById('set-h').value) || 0;
+  const m = parseFloat(document.getElementById('set-m').value) || 0;
+  if (m < 0 || m > 59) { toast('Les minutes doivent être entre 0 et 59'); return; }
+  const ms = (h * 3600 + m * 60) * 1000;
+  if (ms < 0) { toast('Valeur invalide'); return; }
+  if (chronoRunning) {
+    chronoAccumMs += Date.now() - chronoStartMs;
+    chronoStartMs = null;
+    chronoRunning = false;
+    if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+    document.getElementById('btn-start').textContent = 'Démarrer';
+    document.getElementById('btn-start').classList.remove('running');
+    document.getElementById('chrono-disp').className = 'chrono-display';
+  }
+  chronoAccumMs = ms;
+  document.getElementById('chrono-disp').textContent = fmtMs(ms);
+  document.getElementById('chrono-disp').className = 'chrono-display paused';
+  document.getElementById('set-h').value = '';
+  document.getElementById('set-m').value = '';
+  updateBtn();
+  saveStorage();
+  document.getElementById('set-panel').classList.remove('open');
+  toast('Chrono réglé sur ' + formatTime(ms / 3600000));
 }
 
 /* ── Activation bouton Enregistrer ── */
