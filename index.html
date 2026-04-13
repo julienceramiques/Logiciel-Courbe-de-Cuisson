@@ -474,7 +474,7 @@ function renderMetrics() {
 
 function gc() {
   const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  return { grid: dark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.07)', tick: dark ? '#B4B2A9' : '#888780', orangeFill: dark ? 'rgba(216,90,48,0.18)' : 'rgba(216,90,48,0.10)' };
+  return { grid: dark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.45)', tick: dark ? '#B4B2A9' : '#888780', orangeFill: dark ? 'rgba(216,90,48,0.18)' : 'rgba(216,90,48,0.10)' };
 }
 
 Chart.register({
@@ -500,8 +500,8 @@ function renderChart() {
     chart = new Chart(document.getElementById('myChart').getContext('2d'), {
       type: 'line',
       data: { labels, datasets: [
-        { label: 'T°C', data: temps, borderColor: '#D85A30', backgroundColor: c.orangeFill, fill: true, tension: 0.35, pointRadius: 5, pointHitRadius: 20, pointBackgroundColor: '#D85A30', borderWidth: 2.5, yAxisID: 'yT' },
-        { label: 'Vit', data: speeds, borderColor: '#185FA5', backgroundColor: 'transparent', fill: false, tension: 0.35, pointRadius: 4, pointHitRadius: 20, pointBackgroundColor: '#185FA5', borderWidth: 1.5, borderDash: [6,3], spanGaps: true, yAxisID: 'yS' }
+        { label: 'T°C', data: temps, borderColor: '#D85A30', backgroundColor: c.orangeFill, fill: true, tension: 0.35, pointRadius: 2, pointHitRadius: 20, pointBackgroundColor: '#D85A30', borderWidth: 2.5, yAxisID: 'yT' },
+        { label: 'Vit', data: speeds, borderColor: '#185FA5', backgroundColor: 'transparent', fill: false, tension: 0.35, pointRadius: 2, pointHitRadius: 20, pointBackgroundColor: '#185FA5', borderWidth: 1.5, borderDash: [6,3], spanGaps: true, yAxisID: 'yS' }
       ]},
       options: {
         responsive: true, maintainAspectRatio: false, animation: { duration: 300 },
