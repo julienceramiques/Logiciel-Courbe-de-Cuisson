@@ -136,7 +136,7 @@
 
 <div class="top-bar">
   <h1>Courbe de cuisson Four Céramique 🔥</h1>
-  <div style="font-size:10px;color:var(--text2);margin-top:3px;"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="88e2fde4e1ede6ebedfae9e5e1f9fdedfbc8efe5e9e1e4a6ebe7e5">[email&#160;protected]</a></div>
+  <div style="font-size:10px;color:var(--text2);margin-top:3px;">julienceramiques@gmail.com</div>
 </div>
 
 <!-- 2 métriques : température + vitesse -->
@@ -245,7 +245,7 @@
 
 <div class="toast" id="toast"></div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
 const STORAGE_KEY = 'ceramique_v3';
@@ -416,7 +416,7 @@ function captureFromChrono() {
   const t = elapsedH();
   if (t < 0.0001) { toast('Démarrez le chronomètre d\'abord'); return; }
   if (points.find(p => Math.abs(p.time - t) < 0.001)) { toast('Relevé trop proche du précédent'); return; }
-  points.push({ time: t, temp, src: 'chrono', date: Date.now() });
+  points.push({ time: t, temp, src: 'chrono' });
   points.sort((a, b) => a.time - b.time);
   saveStorage();
   document.getElementById('chrono-temp').value = '';
@@ -434,7 +434,7 @@ function captureManual() {
   const t = h + m / 60;
   if (t < 0) { toast('Temps invalide'); return; }
   if (points.find(p => Math.abs(p.time - t) < 0.001)) { toast('Un relevé existe déjà à ce temps'); return; }
-  points.push({ time: t, temp, src: 'manual', date: Date.now() });
+  points.push({ time: t, temp, src: 'manual' });
   points.sort((a, b) => a.time - b.time);
   saveStorage();
   document.getElementById('inp-h').value = '';
@@ -562,8 +562,7 @@ function exportPDF() {
       doc.setFontSize(16); doc.setFont(undefined,'bold'); doc.setTextColor(30,30,28);
       doc.text('Courbe de cuisson Four Céramique', M+3, 14);
       doc.setFontSize(9); doc.setFont(undefined,'normal'); doc.setTextColor(95,94,90);
-      const firstDate = points[0] && points[0].date ? new Date(points[0].date).toLocaleDateString('fr-FR') : now.toLocaleDateString('fr-FR');
-      doc.text('Cuisson réalisée le ' + firstDate, M+3, 20);
+      doc.text('Exporté le ' + ds, M+3, 20);
       const last = points[points.length-1]; const sl = calcSpeed(points.length-1);
       doc.setTextColor(30,30,28); doc.setFontSize(9);
       doc.text(`${points.length} relevés  |  Durée : ${formatTime(last.time)}  |  Temp. finale : ${Math.round(last.temp)} °C  |  Vitesse : ${sl !== null ? Math.round(sl) + ' °C/h' : '—'}`, M+3, 26);
@@ -652,4 +651,12 @@ if (chronoRunning) {
   document.getElementById('chrono-disp').className = 'chrono-display running';
   tick();
 } else if (chronoAccumMs > 0) {
-  document.getElementBy
+  document.getElementById('chrono-disp').textContent = fmtMs(chronoAccumMs);
+  document.getElementById('chrono-disp').className = 'chrono-display paused';
+  document.getElementById('btn-start').textContent = 'Reprendre';
+}
+
+render();
+</script>
+</body>
+</html>
