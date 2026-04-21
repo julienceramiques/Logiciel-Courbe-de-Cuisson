@@ -201,7 +201,7 @@ body { padding: 0 0 40px 0; }
     <div style="display:flex;align-items:center;margin-bottom:10px;padding:0 4px;">
       <div class="chart-legend" id="chart-legend" style="margin-bottom:0;flex:1">
         <div class="legend-item"><div class="legend-dot" style="background:#D85A30"></div>Temp. (&deg;C)</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#185FA5;opacity:0.8"></div>Vitesse (&deg;C/h)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#185FA5;opacity:0.8"></div>Vit (&deg;C/h)</div>
       </div>
       <button class="btn-legend-param" onclick="openParamModal()" title="Param&egrave;tres des &eacute;chelles">&#9881;</button>
     </div>
@@ -447,9 +447,9 @@ function toggleGazMode() {
 
 function updateLegend() {
   var base = '<div class="legend-item"><div class="legend-dot" style="background:#D85A30"></div>Temp. (&deg;C)</div>'
-    + '<div class="legend-item"><div class="legend-dot" style="background:#185FA5;opacity:0.8"></div>Vitesse (&deg;C/h)</div>';
+    + '<div class="legend-item"><div class="legend-dot" style="background:#185FA5;opacity:0.8"></div>Vit (&deg;C/h)</div>';
   if (gazMode) {
-    base += '<div class="legend-item"><div class="legend-dot" style="background:#534AB7"></div>Pression (bar)</div>'
+    base += '<div class="legend-item"><div class="legend-dot" style="background:#534AB7"></div>Pr (bar)</div>'
       + '<div class="legend-item"><div class="legend-dot" style="background:#0F6E56"></div>Registre (%)</div>';
   }
   document.getElementById('chart-legend').innerHTML = base;
