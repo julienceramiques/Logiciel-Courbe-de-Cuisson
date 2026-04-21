@@ -171,12 +171,12 @@ body { padding: 0 0 40px 0; }
 <div class="section">
   <div class="metrics">
     <div class="metric orange">
-      <div class="metric-label">Temp&eacute;rature</div>
+      <div class="metric-label">Echelle Temp&eacute;rature</div>
       <div class="metric-val" id="m-temp">&mdash;</div>
       <div class="metric-unit">&deg;C dernier relev&eacute;</div>
     </div>
     <div class="metric blue">
-      <div class="metric-label">Vitesse</div>
+      <div class="metric-label">Echelle Vitesse</div>
       <div class="metric-val" id="m-speed">&mdash;</div>
       <div class="metric-unit">&deg;C/h</div>
     </div>
@@ -209,7 +209,7 @@ body { padding: 0 0 40px 0; }
     <div class="param-overlay" id="param-overlay" onclick="closeParamIfOutside(event)">
       <div class="param-sheet" id="param-sheet">
         <div class="param-sheet-title">
-          &Eacute;chelles du graphique
+          Param&egrave;tres du graphique
           <button class="btn-param-close" onclick="closeParamModal()">&#x2715;</button>
         </div>
         <div class="param-row">
@@ -232,7 +232,7 @@ body { padding: 0 0 40px 0; }
         </div>
         <div class="param-divider"></div>
         <div class="param-row param-row-gaz" id="p-row-pression">
-          <div class="param-label"><div class="param-label-dot" style="background:#534AB7"></div>Pression gaz</div>
+          <div class="param-label"><div class="param-label-dot" style="background:#534AB7"></div>Echelle Pression gaz</div>
           <div class="param-inputs">
             <input type="number" id="p-pres-min" inputmode="decimal" placeholder="0" value="0" step="0.1" />
             <span>—</span>
@@ -241,12 +241,29 @@ body { padding: 0 0 40px 0; }
           </div>
         </div>
         <div class="param-row param-row-gaz" id="p-row-registre">
-          <div class="param-label"><div class="param-label-dot" style="background:#0F6E56"></div>Registre</div>
+          <div class="param-label"><div class="param-label-dot" style="background:#0F6E56"></div>Echelle Registre</div>
           <div class="param-inputs">
             <input type="number" id="p-reg-min" inputmode="numeric" placeholder="0" value="0" />
             <span>—</span>
             <input type="number" id="p-reg-max" inputmode="numeric" placeholder="100" value="100" />
             <span>%</span>
+          </div>
+        </div>
+        <div class="param-divider"></div>
+        <div class="param-row">
+          <div class="param-label"><div class="param-label-dot" style="background:#888780"></div>Temps affich&eacute;</div>
+          <div class="param-inputs">
+            <input type="number" id="p-time-min" inputmode="decimal" placeholder="0" value="0" step="0.5" min="0" />
+            <span>&mdash;</span>
+            <input type="number" id="p-time-max" inputmode="decimal" placeholder="auto" value="" step="0.5" min="0" />
+            <span>h (vide=auto)</span>
+          </div>
+        </div>
+        <div class="param-row">
+          <div class="param-label"><div class="param-label-dot" style="background:#5F5E5A"></div>Dur&eacute;e info bulle</div>
+          <div class="param-inputs">
+            <input type="number" id="p-tooltip-sec" inputmode="numeric" placeholder="4" value="4" min="1" max="60" step="1" />
+            <span>secondes</span>
           </div>
         </div>
         <button class="btn-param-apply" onclick="applyParamModal()">Appliquer</button>
@@ -658,7 +675,7 @@ Chart.register({
       tooltipHideTimer = setTimeout(function() {
         ch.tooltip.setActiveElements([], { x: 0, y: 0 });
         ch.update('none');
-      }, 4000);
+      }, chartScales.tooltipDelay);
     }
   }
 });
@@ -941,7 +958,7 @@ function exportPDF() {
 
 
 /* ── Paramètres graphique ── */
-var chartScales = { tempMin: 0, tempMax: 1400, spdMin: -500, spdMax: 500, presMin: 0, presMax: 1, regMin: 0, regMax: 100 };
+var chartScales = { tempMin: 0, tempMax: 1400, spdMin: -500, spdMax: 500, presMin: 0, presMax: 1, regMin: 0, regMax: 100, timeMin: undefined, timeMax: undefined, tooltipDelay: 4000 };
 
 function openParamModal() {
   document.getElementById('p-temp-min').value = chartScales.tempMin;
@@ -952,6 +969,9 @@ function openParamModal() {
   document.getElementById('p-pres-max').value = chartScales.presMax;
   document.getElementById('p-reg-min').value  = chartScales.regMin;
   document.getElementById('p-reg-max').value  = chartScales.regMax;
+  document.getElementById('p-time-min').value = chartScales.timeMin !== undefined ? chartScales.timeMin : '';
+  document.getElementById('p-time-max').value = chartScales.timeMax !== undefined ? chartScales.timeMax : '';
+  document.getElementById('p-tooltip-sec').value = chartScales.tooltipDelay / 1000;
   var active = gazMode ? 'active' : '';
   document.getElementById('p-row-pression').className = 'param-row param-row-gaz ' + active;
   document.getElementById('p-row-registre').className = 'param-row param-row-gaz ' + active;
@@ -979,6 +999,12 @@ function applyParamModal() {
   if (!isNaN(sMin) && !isNaN(sMax) && sMax > sMin) { chartScales.spdMin = sMin; chartScales.spdMax = sMax; }
   if (!isNaN(pMin) && !isNaN(pMax) && pMax > pMin) { chartScales.presMin = pMin; chartScales.presMax = pMax; }
   if (!isNaN(rMin) && !isNaN(rMax) && rMax > rMin) { chartScales.regMin = rMin; chartScales.regMax = rMax; }
+  var tMinRaw = document.getElementById('p-time-min').value;
+  var tMaxRaw = document.getElementById('p-time-max').value;
+  chartScales.timeMin = tMinRaw !== '' ? parseFloat(tMinRaw) : undefined;
+  chartScales.timeMax = tMaxRaw !== '' ? parseFloat(tMaxRaw) : undefined;
+  var tooltipSec = parseFloat(document.getElementById('p-tooltip-sec').value);
+  if (!isNaN(tooltipSec) && tooltipSec >= 1) chartScales.tooltipDelay = Math.round(tooltipSec * 1000);
   if (chart) {
     chart.options.scales.yT.min = chartScales.tempMin;
     chart.options.scales.yT.max = chartScales.tempMax;
@@ -988,6 +1014,8 @@ function applyParamModal() {
     chart.options.scales.yP.max = chartScales.presMax;
     chart.options.scales.yR.min = chartScales.regMin;
     chart.options.scales.yR.max = chartScales.regMax;
+    chart.options.scales.x.min = chartScales.timeMin;
+    chart.options.scales.x.max = chartScales.timeMax;
     chart.update();
   }
   closeParamModal();
