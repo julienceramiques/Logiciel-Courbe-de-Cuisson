@@ -203,7 +203,7 @@ body { padding: 0 0 40px 0; }
         <div class="legend-item"><div class="legend-dot" style="background:#D85A30"></div>Temp. (&deg;C)</div>
         <div class="legend-item"><div class="legend-dot" style="background:#185FA5;opacity:0.8"></div>Vitesse (&deg;C/h)</div>
       </div>
-      <span style="font-size:11px;color:var(--text2);margin-right:4px">Param&egrave;tres des &eacute;chelles de valeurs</span><button class="btn-legend-param" onclick="openParamModal()" title="Param&egrave;tres des &eacute;chelles">&#9881;</button>
+      <button class="btn-legend-param" onclick="openParamModal()" title="Param&egrave;tres des &eacute;chelles">&#9881;</button>
     </div>
 
     <div class="param-overlay" id="param-overlay" onclick="closeParamIfOutside(event)">
@@ -289,7 +289,7 @@ body { padding: 0 0 40px 0; }
               <input type="number" id="chrono-pression" inputmode="decimal" placeholder="0.0" value="0.4" min="0" max="3" step="0.1" autocomplete="off" />
             </div>
             <div class="field">
-              <label for="chrono-registre">Ouverture Registre (%)</label>
+              <label for="chrono-registre">Registre (%)</label>
               <input type="number" id="chrono-registre" inputmode="numeric" placeholder="0" value="100" min="0" max="100" autocomplete="off" />
             </div>
           </div>
@@ -324,7 +324,7 @@ body { padding: 0 0 40px 0; }
               <input type="number" id="inp-pression" inputmode="decimal" placeholder="0.0" value="0.4" min="0" max="3" step="0.1" autocomplete="off" />
             </div>
             <div class="field">
-              <label for="inp-registre">Ouverture Registre (%)</label>
+              <label for="inp-registre">Registre (%)</label>
               <input type="number" id="inp-registre" inputmode="numeric" placeholder="0" value="100" min="0" max="100" autocomplete="off" />
             </div>
           </div>
@@ -450,7 +450,7 @@ function updateLegend() {
     + '<div class="legend-item"><div class="legend-dot" style="background:#185FA5;opacity:0.8"></div>Vitesse (&deg;C/h)</div>';
   if (gazMode) {
     base += '<div class="legend-item"><div class="legend-dot" style="background:#534AB7"></div>Pression (bar)</div>'
-      + '<div class="legend-item"><div class="legend-dot" style="background:#0F6E56"></div>Ouverture Registre (%)</div>';
+      + '<div class="legend-item"><div class="legend-dot" style="background:#0F6E56"></div>Registre (%)</div>';
   }
   document.getElementById('chart-legend').innerHTML = base;
 }
