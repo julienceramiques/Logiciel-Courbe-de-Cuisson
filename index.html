@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#ffffff">
-<title>Courbe de cuisson Four Céramique</title>
+<title>Courbe de cuisson Four C&eacute;ramique</title>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
@@ -15,6 +15,8 @@
   --green: #3B6D11; --green-bg: #EAF3DE;
   --red: #A32D2D; --red-bg: #FCEBEB;
   --amber: #BA7517; --amber-bg: #FAEEDA;
+  --purple: #534AB7; --purple-bg: #EEEDFE;
+  --teal: #0F6E56; --teal-bg: #E1F5EE;
   --border: rgba(0,0,0,0.12); --surface: #f5f4f1; --card: #ffffff;
   --text: #1a1a18; --text2: #5F5E5A;
   --radius: 12px; --radius-sm: 8px;
@@ -26,6 +28,8 @@
     --green: #97C459; --green-bg: #173404;
     --red: #F09595; --red-bg: #501313;
     --amber: #EF9F27; --amber-bg: #412402;
+    --purple: #AFA9EC; --purple-bg: #26215C;
+    --teal: #5DCAA5; --teal-bg: #04342C;
     --border: rgba(255,255,255,0.12); --surface: #1a1a18; --card: #2a2a28;
     --text: #f0ede8; --text2: #B4B2A9;
   }
@@ -33,7 +37,7 @@
 html, body { background: var(--surface); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 16px; line-height: 1.5; min-height: 100vh; }
 body { padding: 0 0 40px 0; }
 
-.top-bar { background: var(--card); border-bottom: 0.5px solid var(--border); padding: 12px 16px 10px; text-align: center; position: sticky; top: 0; z-index: 10; display: flex; flex-direction: column; align-items: center; gap: 0; }
+.top-bar { background: var(--card); border-bottom: 0.5px solid var(--border); padding: 12px 16px 10px; text-align: center; position: sticky; top: 0; z-index: 10; display: flex; flex-direction: column; align-items: center; }
 .top-bar h1 { font-size: 16px; font-weight: 600; color: var(--text); letter-spacing: -0.2px; }
 .top-bar .author { font-size: 10px; color: var(--text2); margin-top: 2px; }
 
@@ -47,11 +51,22 @@ body { padding: 0 0 40px 0; }
 .metric.orange .metric-val { color: var(--orange); }
 .metric.blue .metric-val { color: var(--blue); }
 
+/* ── Mode gaz toggle ── */
+.gaz-toggle-row { display: flex; align-items: center; justify-content: space-between; background: var(--card); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 11px 14px; }
+.gaz-toggle-label { font-size: 14px; font-weight: 500; color: var(--text); }
+.gaz-toggle-label span { font-size: 11px; color: var(--text2); display: block; font-weight: 400; margin-top: 1px; }
+.toggle-switch { position: relative; width: 44px; height: 26px; flex-shrink: 0; }
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.toggle-slider { position: absolute; inset: 0; background: var(--border); border-radius: 26px; cursor: pointer; transition: background 0.2s; }
+.toggle-slider:before { content: ''; position: absolute; width: 20px; height: 20px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: transform 0.2s; }
+.toggle-switch input:checked + .toggle-slider { background: var(--orange); }
+.toggle-switch input:checked + .toggle-slider:before { transform: translateX(18px); }
+
 .chart-card { background: var(--card); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 14px 10px 10px; }
-.chart-legend { display: flex; gap: 16px; margin-bottom: 10px; padding: 0 4px; flex-wrap: wrap; }
-.legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text2); }
+.chart-legend { display: flex; gap: 12px; margin-bottom: 10px; padding: 0 4px; flex-wrap: wrap; }
+.legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text2); }
 .legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
-.chart-wrap { position: relative; width: 100%; height: 220px; }
+.chart-wrap { position: relative; width: 100%; height: 340px; }
 
 .input-card { background: var(--card); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 14px; }
 .two-cols { display: grid; grid-template-columns: 1fr 1px 1fr; gap: 10px; margin-bottom: 12px; }
@@ -72,14 +87,13 @@ body { padding: 0 0 40px 0; }
 .btn-chrono-set { background: var(--blue-bg); color: var(--blue); border: 0.5px solid rgba(24,95,165,0.25); border-radius: var(--radius-sm); padding: 9px 4px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; -webkit-tap-highlight-color: transparent; }
 .btn-chrono-set:active { opacity: 0.75; }
 
-.chrono-set-panel { overflow: hidden; max-height: 0; opacity: 0; transition: max-height 0.25s ease, opacity 0.2s ease, margin 0.25s ease; margin-top: 0; }
+.chrono-set-panel { overflow: hidden; max-height: 0; opacity: 0; transition: max-height 0.25s ease, opacity 0.2s ease, margin 0.25s ease; }
 .chrono-set-panel.open { max-height: 60px; opacity: 1; margin-top: 4px; }
 .chrono-set-fields { display: flex; align-items: center; gap: 5px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 5px 7px; }
 .chrono-set-fields input { background: transparent; border: none; outline: none; padding: 3px 2px; font-size: 16px; color: var(--text); font-family: inherit; -webkit-appearance: none; appearance: none; text-align: center; font-weight: 600; width: 100%; }
 .chrono-set-fields input::placeholder { font-size: 12px; font-weight: 400; opacity: 0.4; }
 .set-sep { font-size: 16px; font-weight: 700; color: var(--text2); flex-shrink: 0; }
-.btn-set-ok { background: var(--orange); color: #fff; border: none; border-radius: var(--radius-sm); padding: 5px 9px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; -webkit-tap-highlight-color: transparent; flex-shrink: 0; }
-.btn-set-ok:active { opacity: 0.8; }
+.btn-set-ok { background: var(--orange); color: #fff; border: none; border-radius: var(--radius-sm); padding: 5px 9px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; flex-shrink: 0; }
 
 .field { display: flex; flex-direction: column; gap: 4px; }
 .field label { font-size: 11px; color: var(--text2); font-weight: 500; text-align: center; }
@@ -87,6 +101,11 @@ body { padding: 0 0 40px 0; }
 .field input:focus { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(216,90,48,0.15); }
 .field input::placeholder { font-size: 13px; font-weight: 400; opacity: 0.4; }
 .hmin-row { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+
+/* Champs gaz */
+.gaz-fields { display: none; flex-direction: column; gap: 6px; }
+.gaz-fields.visible { display: flex; }
+.gaz-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 
 .btn-capture { width: 100%; background: var(--orange); color: #fff; border: none; border-radius: var(--radius-sm); padding: 15px; font-size: 16px; font-weight: 700; cursor: pointer; font-family: inherit; -webkit-tap-highlight-color: transparent; }
 .btn-capture:active { opacity: 0.85; transform: scale(0.98); }
@@ -100,19 +119,43 @@ body { padding: 0 0 40px 0; }
 .divider { height: 0.5px; background: var(--border); margin: 12px 0 0; }
 
 .table-card { background: var(--card); border: 0.5px solid var(--border); border-radius: var(--radius); overflow: hidden; }
-.table-header { display: grid; grid-template-columns: 26px 1fr 52px 52px 32px; padding: 9px 10px; background: var(--surface); border-bottom: 0.5px solid var(--border); }
-.table-header span { font-size: 11px; color: var(--text2); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
-.table-row { display: grid; grid-template-columns: 26px 1fr 52px 52px 32px; padding: 11px 10px; border-bottom: 0.5px solid var(--border); align-items: center; }
+.table-header { display: grid; grid-template-columns: 22px 1fr 44px 44px 44px 44px 28px; padding: 9px 8px; background: var(--surface); border-bottom: 0.5px solid var(--border); }
+.table-header.no-gaz { grid-template-columns: 26px 1fr 52px 52px 32px; }
+.table-header span { font-size: 10px; color: var(--text2); font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; }
+.table-row { display: grid; grid-template-columns: 22px 1fr 44px 44px 44px 44px 28px; padding: 10px 8px; border-bottom: 0.5px solid var(--border); align-items: center; }
+.table-row.no-gaz { grid-template-columns: 26px 1fr 52px 52px 32px; }
 .table-row:last-child { border-bottom: none; }
-.table-row span { font-size: 14px; color: var(--text); }
+.table-row span { font-size: 13px; color: var(--text); }
 .num { color: var(--text2); font-size: 12px; }
 .spd-up { color: var(--green); font-weight: 600; }
 .spd-dn { color: var(--red); font-weight: 600; }
 .spd-na { color: var(--text2); }
-.src-badge { font-size: 10px; display: inline-block; vertical-align: middle; margin-left: 3px; opacity: 0.7; }
-.btn-del { background: none; border: none; cursor: pointer; color: var(--text2); font-size: 18px; padding: 0; line-height: 1; -webkit-tap-highlight-color: transparent; width: 28px; text-align: center; }
+.src-badge { font-size: 10px; display: inline-block; vertical-align: middle; margin-left: 2px; opacity: 0.6; }
+.btn-del { background: none; border: none; cursor: pointer; color: var(--text2); font-size: 16px; padding: 0; line-height: 1; -webkit-tap-highlight-color: transparent; width: 24px; text-align: center; }
 .btn-del:active { color: var(--red); }
 .no-data { padding: 28px 16px; text-align: center; color: var(--text2); font-size: 14px; }
+
+
+/* ── Modal paramètres graphique ── */
+.param-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 300; align-items: flex-end; justify-content: center; }
+.param-overlay.open { display: flex; }
+.param-sheet { background: var(--card); border-radius: var(--radius) var(--radius) 0 0; width: 100%; max-width: 480px; padding: 20px 18px 32px; }
+.param-sheet-title { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
+.btn-param-close { background: none; border: none; font-size: 20px; color: var(--text2); cursor: pointer; padding: 0 4px; line-height: 1; }
+.param-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+.param-label { font-size: 13px; color: var(--text); flex: 1; display: flex; align-items: center; gap: 7px; }
+.param-label-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+.param-inputs { display: flex; align-items: center; gap: 6px; }
+.param-inputs input { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 7px 6px; font-size: 14px; color: var(--text); width: 64px; font-family: inherit; -webkit-appearance: none; appearance: none; outline: none; text-align: center; font-weight: 600; }
+.param-inputs input:focus { border-color: var(--orange); }
+.param-inputs span { font-size: 12px; color: var(--text2); }
+.param-divider { height: 0.5px; background: var(--border); margin: 12px 0; }
+.param-row-gaz { opacity: 0.35; pointer-events: none; }
+.param-row-gaz.active { opacity: 1; pointer-events: auto; }
+.btn-param-apply { width: 100%; background: var(--orange); color: #fff; border: none; border-radius: var(--radius-sm); padding: 14px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; margin-top: 6px; }
+.btn-param-apply:active { opacity: 0.85; }
+.btn-legend-param { background: none; border: none; cursor: pointer; color: var(--text2); font-size: 16px; padding: 2px 4px; line-height: 1; margin-left: auto; -webkit-tap-highlight-color: transparent; flex-shrink: 0; }
+.btn-legend-param:active { color: var(--orange); }
 
 .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #1a1a18; color: #fff; border-radius: 20px; padding: 10px 20px; font-size: 14px; font-weight: 500; opacity: 0; transition: opacity 0.25s; z-index: 100; white-space: nowrap; pointer-events: none; }
 .toast.show { opacity: 1; }
@@ -141,10 +184,73 @@ body { padding: 0 0 40px 0; }
 </div>
 
 <div class="section">
+  <div class="gaz-toggle-row">
+    <div class="gaz-toggle-label">
+      Mode cuisson gaz
+      <span>Ajoute pression gaz et registre chemin&eacute;e</span>
+    </div>
+    <label class="toggle-switch">
+      <input type="checkbox" id="gaz-toggle" onchange="toggleGazMode()">
+      <span class="toggle-slider"></span>
+    </label>
+  </div>
+</div>
+
+<div class="section">
   <div class="chart-card">
-    <div class="chart-legend">
-      <div class="legend-item"><div class="legend-dot" style="background:#D85A30"></div>Temp&eacute;rature (&deg;C)</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#185FA5;opacity:0.7"></div>Vitesse (&deg;C/h)</div>
+    <div style="display:flex;align-items:center;margin-bottom:10px;padding:0 4px;">
+      <div class="chart-legend" id="chart-legend" style="margin-bottom:0;flex:1">
+        <div class="legend-item"><div class="legend-dot" style="background:#D85A30"></div>Temp. (&deg;C)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#185FA5;opacity:0.8"></div>Vitesse (&deg;C/h)</div>
+      </div>
+      <span style="font-size:11px;color:var(--text2);margin-right:4px">Param&egrave;tres des &eacute;chelles de valeurs</span><button class="btn-legend-param" onclick="openParamModal()" title="Param&egrave;tres des &eacute;chelles">&#9881;</button>
+    </div>
+
+    <div class="param-overlay" id="param-overlay" onclick="closeParamIfOutside(event)">
+      <div class="param-sheet" id="param-sheet">
+        <div class="param-sheet-title">
+          &Eacute;chelles du graphique
+          <button class="btn-param-close" onclick="closeParamModal()">&#x2715;</button>
+        </div>
+        <div class="param-row">
+          <div class="param-label"><div class="param-label-dot" style="background:#D85A30"></div>Temp&eacute;rature</div>
+          <div class="param-inputs">
+            <input type="number" id="p-temp-min" inputmode="numeric" placeholder="0" value="0" />
+            <span>—</span>
+            <input type="number" id="p-temp-max" inputmode="numeric" placeholder="1400" value="1400" />
+            <span>&deg;C</span>
+          </div>
+        </div>
+        <div class="param-row">
+          <div class="param-label"><div class="param-label-dot" style="background:#185FA5"></div>Vitesse</div>
+          <div class="param-inputs">
+            <input type="number" id="p-spd-min" inputmode="numeric" placeholder="-500" value="-500" />
+            <span>—</span>
+            <input type="number" id="p-spd-max" inputmode="numeric" placeholder="500" value="500" />
+            <span>&deg;C/h</span>
+          </div>
+        </div>
+        <div class="param-divider"></div>
+        <div class="param-row param-row-gaz" id="p-row-pression">
+          <div class="param-label"><div class="param-label-dot" style="background:#534AB7"></div>Pression gaz</div>
+          <div class="param-inputs">
+            <input type="number" id="p-pres-min" inputmode="decimal" placeholder="0" value="0" step="0.1" />
+            <span>—</span>
+            <input type="number" id="p-pres-max" inputmode="decimal" placeholder="1" value="1" step="0.1" />
+            <span>bar</span>
+          </div>
+        </div>
+        <div class="param-row param-row-gaz" id="p-row-registre">
+          <div class="param-label"><div class="param-label-dot" style="background:#0F6E56"></div>Registre</div>
+          <div class="param-inputs">
+            <input type="number" id="p-reg-min" inputmode="numeric" placeholder="0" value="0" />
+            <span>—</span>
+            <input type="number" id="p-reg-max" inputmode="numeric" placeholder="100" value="100" />
+            <span>%</span>
+          </div>
+        </div>
+        <button class="btn-param-apply" onclick="applyParamModal()">Appliquer</button>
+      </div>
     </div>
     <div class="chart-wrap">
       <canvas id="myChart" role="img" aria-label="Courbe de cuisson four ceramique"></canvas>
@@ -176,6 +282,18 @@ body { padding: 0 0 40px 0; }
           <label for="chrono-temp">Temp&eacute;rature &deg;C</label>
           <input type="number" id="chrono-temp" inputmode="numeric" placeholder="ex : 850" min="0" max="1400" autocomplete="off" />
         </div>
+        <div class="gaz-fields" id="chrono-gaz-fields">
+          <div class="gaz-row">
+            <div class="field">
+              <label for="chrono-pression">Pression (bar)</label>
+              <input type="number" id="chrono-pression" inputmode="decimal" placeholder="0.0" value="0.4" min="0" max="3" step="0.1" autocomplete="off" />
+            </div>
+            <div class="field">
+              <label for="chrono-registre">Ouverture Registre (%)</label>
+              <input type="number" id="chrono-registre" inputmode="numeric" placeholder="0" value="100" min="0" max="100" autocomplete="off" />
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="col-sep"></div>
@@ -199,6 +317,18 @@ body { padding: 0 0 40px 0; }
           <label for="inp-temp">Temp&eacute;rature &deg;C</label>
           <input type="number" id="inp-temp" inputmode="numeric" placeholder="ex : 450" min="0" max="1400" autocomplete="off" />
         </div>
+        <div class="gaz-fields" id="manual-gaz-fields">
+          <div class="gaz-row">
+            <div class="field">
+              <label for="inp-pression">Pression (bar)</label>
+              <input type="number" id="inp-pression" inputmode="decimal" placeholder="0.0" value="0.4" min="0" max="3" step="0.1" autocomplete="off" />
+            </div>
+            <div class="field">
+              <label for="inp-registre">Ouverture Registre (%)</label>
+              <input type="number" id="inp-registre" inputmode="numeric" placeholder="0" value="100" min="0" max="100" autocomplete="off" />
+            </div>
+          </div>
+        </div>
       </div>
 
     </div>
@@ -221,17 +351,21 @@ body { padding: 0 0 40px 0; }
 
 <div class="toast" id="toast"></div>
 
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
-var STORAGE_KEY = 'ceramique_v3';
+var STORAGE_KEY = 'ceramique_v4';
 var points = [];
 var chart = null;
+var gazMode = false;
 var tooltipHideTimer = null;
 var chronoRunning = false;
 var chronoStartMs = null;
 var chronoAccumMs = 0;
 var rafId = null;
+var lastPression = '0.4';
+var lastRegistre = '100';
 
 function loadStorage() {
   try {
@@ -239,6 +373,7 @@ function loadStorage() {
     if (!raw) return;
     var d = JSON.parse(raw);
     points = d.points || [];
+    gazMode = d.gazMode || false;
     chronoAccumMs = d.accumMs || 0;
     if (d.running && d.startMs) {
       chronoStartMs = d.startMs;
@@ -250,10 +385,8 @@ function loadStorage() {
 function saveStorage() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
-      points: points,
-      running: chronoRunning,
-      startMs: chronoStartMs,
-      accumMs: chronoAccumMs
+      points: points, gazMode: gazMode,
+      running: chronoRunning, startMs: chronoStartMs, accumMs: chronoAccumMs
     }));
   } catch(e) {}
 }
@@ -261,10 +394,7 @@ function saveStorage() {
 function elapsedMs() {
   return chronoRunning ? chronoAccumMs + (Date.now() - chronoStartMs) : chronoAccumMs;
 }
-
-function elapsedH() {
-  return elapsedMs() / 3600000;
-}
+function elapsedH() { return elapsedMs() / 3600000; }
 
 function fmtMs(ms) {
   var s = Math.floor(ms / 1000);
@@ -273,11 +403,7 @@ function fmtMs(ms) {
   var sc = s % 60;
   return h + ':' + pad(m) + ':' + pad(sc);
 }
-
-function pad(n) {
-  return String(n).padStart(2, '0');
-}
-
+function pad(n) { return String(n).padStart(2, '0'); }
 function formatTime(h) {
   var hr = Math.floor(h);
   var mn = Math.round((h - hr) * 60);
@@ -297,6 +423,36 @@ function showToast(msg) {
   el.classList.add('show');
   clearTimeout(el._t);
   el._t = setTimeout(function() { el.classList.remove('show'); }, 2400);
+}
+
+/* ── Mode gaz ── */
+function toggleGazMode() {
+  gazMode = document.getElementById('gaz-toggle').checked;
+  document.getElementById('chrono-gaz-fields').classList.toggle('visible', gazMode);
+  document.getElementById('manual-gaz-fields').classList.toggle('visible', gazMode);
+  saveStorage();
+  updateLegend();
+  if (gazMode) {
+    document.getElementById('chrono-pression').value = lastPression;
+    document.getElementById('chrono-registre').value = lastRegistre;
+    document.getElementById('inp-pression').value = lastPression;
+    document.getElementById('inp-registre').value = lastRegistre;
+  }
+  if (chart) {
+    chart.data.datasets[2].hidden = !gazMode;
+    chart.data.datasets[3].hidden = !gazMode;
+    chart.update();
+  }
+}
+
+function updateLegend() {
+  var base = '<div class="legend-item"><div class="legend-dot" style="background:#D85A30"></div>Temp. (&deg;C)</div>'
+    + '<div class="legend-item"><div class="legend-dot" style="background:#185FA5;opacity:0.8"></div>Vitesse (&deg;C/h)</div>';
+  if (gazMode) {
+    base += '<div class="legend-item"><div class="legend-dot" style="background:#534AB7"></div>Pression (bar)</div>'
+      + '<div class="legend-item"><div class="legend-dot" style="background:#0F6E56"></div>Ouverture Registre (%)</div>';
+  }
+  document.getElementById('chart-legend').innerHTML = base;
 }
 
 /* ── Chrono ── */
@@ -328,17 +484,14 @@ function tick() {
 }
 
 function resetChrono() {
-  if ((chronoRunning || chronoAccumMs > 0) && !confirm('Reinitialiser le chronom\u00e8tre ? Les relev\u00e9s ne seront pas effac\u00e9s.')) return;
-  chronoRunning = false;
-  chronoStartMs = null;
-  chronoAccumMs = 0;
+  if ((chronoRunning || chronoAccumMs > 0) && !confirm('R\u00e9initialiser le chronom\u00e8tre ?')) return;
+  chronoRunning = false; chronoStartMs = null; chronoAccumMs = 0;
   if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
   document.getElementById('chrono-disp').textContent = '0:00:00';
   document.getElementById('chrono-disp').className = 'chrono-display';
   document.getElementById('btn-start').textContent = 'D\u00e9marrer';
   document.getElementById('btn-start').classList.remove('running');
-  updateBtn();
-  saveStorage();
+  updateBtn(); saveStorage();
   showToast('Chronom\u00e8tre r\u00e9initialis\u00e9');
 }
 
@@ -357,8 +510,7 @@ function setChronoTime() {
   var ms = (h * 3600 + m * 60) * 1000;
   if (chronoRunning) {
     chronoAccumMs += Date.now() - chronoStartMs;
-    chronoStartMs = null;
-    chronoRunning = false;
+    chronoStartMs = null; chronoRunning = false;
     if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
     document.getElementById('btn-start').textContent = 'D\u00e9marrer';
     document.getElementById('btn-start').classList.remove('running');
@@ -369,8 +521,7 @@ function setChronoTime() {
   document.getElementById('set-h').value = '';
   document.getElementById('set-m').value = '';
   document.getElementById('set-panel').classList.remove('open');
-  updateBtn();
-  saveStorage();
+  updateBtn(); saveStorage();
   showToast('Chrono r\u00e9gl\u00e9 sur ' + formatTime(ms / 3600000));
 }
 
@@ -392,13 +543,18 @@ function enregistrer() {
   var manTemp = document.getElementById('inp-temp').value;
   var chronoReady = chronoTemp !== '' && elapsedMs() >= 100;
   var manualReady = (manH !== '' || manM !== '') && manTemp !== '';
-  if (chronoReady) {
-    captureFromChrono();
-  } else if (manualReady) {
-    captureManual();
-  } else {
-    showToast('Remplissez les champs');
-  }
+  if (chronoReady) captureFromChrono();
+  else if (manualReady) captureManual();
+  else showToast('Remplissez les champs');
+}
+
+function parseGaz(presId, regId) {
+  var pres = document.getElementById(presId).value;
+  var reg  = document.getElementById(regId).value;
+  return {
+    pression: pres !== '' ? parseFloat(pres) : null,
+    registre: reg  !== '' ? parseFloat(reg)  : null
+  };
 }
 
 function captureFromChrono() {
@@ -407,13 +563,23 @@ function captureFromChrono() {
   var t = elapsedH();
   if (t < 0.0001) { showToast('D\u00e9marrez le chronom\u00e8tre'); return; }
   if (points.find(function(p) { return Math.abs(p.time - t) < 0.001; })) { showToast('Relev\u00e9 trop proche'); return; }
-  points.push({ time: t, temp: temp, src: 'chrono', date: Date.now() });
+  var g = gazMode ? parseGaz('chrono-pression', 'chrono-registre') : {};
+  points.push({ time: t, temp: temp, src: 'chrono', date: Date.now(), pression: g.pression, registre: g.registre });
   points.sort(function(a, b) { return a.time - b.time; });
   saveStorage();
   document.getElementById('chrono-temp').value = '';
-  updateBtn();
-  render();
-  showToast('Relev\u00e9 chrono \u2014 ' + formatTime(t) + ' \u2192 ' + Math.round(temp) + ' \u00b0C');
+  if (gazMode) {
+    var lp = document.getElementById('chrono-pression').value;
+    var lr = document.getElementById('chrono-registre').value;
+    lastPression = lp !== '' ? lp : lastPression;
+    lastRegistre = lr !== '' ? lr : lastRegistre;
+    document.getElementById('chrono-pression').value = lastPression;
+    document.getElementById('chrono-registre').value = lastRegistre;
+    document.getElementById('inp-pression').value = lastPression;
+    document.getElementById('inp-registre').value = lastRegistre;
+  }
+  updateBtn(); render();
+  showToast('Relev\u00e9 chrono \u2014 ' + formatTime(t) + ' \u2192 ' + Math.round(temp) + '\u00b0C');
 }
 
 function captureManual() {
@@ -423,41 +589,44 @@ function captureManual() {
   if (isNaN(temp) || temp < 0 || temp > 1400) { showToast('Temp\u00e9rature invalide'); return; }
   if (m < 0 || m > 59) { showToast('Minutes : 0 \u00e0 59'); return; }
   var t = h + m / 60;
-  if (points.find(function(p) { return Math.abs(p.time - t) < 0.001; })) { showToast('Relev\u00e9 d\u00e9j\u00e0 existant'); return; }
-  points.push({ time: t, temp: temp, src: 'manual', date: Date.now() });
+  if (points.find(function(p) { return Math.abs(p.time - t) < 0.001; })) { showToast('Relev\u00e9 existant'); return; }
+  var g = gazMode ? parseGaz('inp-pression', 'inp-registre') : {};
+  points.push({ time: t, temp: temp, src: 'manual', date: Date.now(), pression: g.pression, registre: g.registre });
   points.sort(function(a, b) { return a.time - b.time; });
   saveStorage();
   document.getElementById('inp-h').value = '';
   document.getElementById('inp-m').value = '';
   document.getElementById('inp-temp').value = '';
-  updateBtn();
-  render();
-  showToast('Relev\u00e9 manuel \u2014 ' + formatTime(t) + ' \u2192 ' + Math.round(temp) + ' \u00b0C');
+  if (gazMode) {
+    var lp = document.getElementById('inp-pression').value;
+    var lr = document.getElementById('inp-registre').value;
+    lastPression = lp !== '' ? lp : lastPression;
+    lastRegistre = lr !== '' ? lr : lastRegistre;
+    document.getElementById('chrono-pression').value = lastPression;
+    document.getElementById('chrono-registre').value = lastRegistre;
+    document.getElementById('inp-pression').value = lastPression;
+    document.getElementById('inp-registre').value = lastRegistre;
+  }
+  updateBtn(); render();
+  showToast('Relev\u00e9 manuel \u2014 ' + formatTime(t) + ' \u2192 ' + Math.round(temp) + '\u00b0C');
 }
 
 function deletePoint(i) {
   if (!confirm('Supprimer ce relev\u00e9 ?')) return;
   points.splice(i, 1);
-  saveStorage();
-  render();
+  saveStorage(); render();
   showToast('Relev\u00e9 supprim\u00e9');
 }
 
 function clearAll() {
   if (!points.length) return;
   if (!confirm('Effacer tous les relev\u00e9s ?')) return;
-  points = [];
-  saveStorage();
-  render();
+  points = []; saveStorage(); render();
   showToast('Donn\u00e9es effac\u00e9es');
 }
 
 /* ── Rendu ── */
-function render() {
-  renderMetrics();
-  renderChart();
-  renderTable();
-}
+function render() { renderMetrics(); renderChart(); renderTable(); }
 
 function renderMetrics() {
   if (!points.length) {
@@ -495,12 +664,15 @@ Chart.register({
 });
 
 function renderChart() {
-  var labels = points.map(function(p) { return formatTime(p.time); });
-  var temps  = points.map(function(p) { return p.temp; });
-  var speeds = points.map(function(p, i) {
+  var temps    = points.map(function(p) { return { x: p.time, y: p.temp }; });
+  var speeds   = points.map(function(p, i) {
     var s = calcSpeed(i);
-    return s !== null ? parseFloat(s.toFixed(1)) : null;
+    if (s === null) return { x: p.time, y: null };
+    var v = parseFloat(s.toFixed(1));
+    return { x: p.time, y: v };
   });
+  var pressions = points.map(function(p) { return { x: p.time, y: p.pression !== undefined ? p.pression : null }; });
+  var registres = points.map(function(p) { return { x: p.time, y: p.registre !== undefined ? p.registre : null }; });
   var c = getChartColors();
 
   if (!chart) {
@@ -508,55 +680,54 @@ function renderChart() {
     chart = new Chart(ctx, {
       type: 'line',
       data: {
-        labels: labels,
         datasets: [
           {
-            label: 'T\u00b0C',
+            label: 'Temp\u00e9rature (\u00b0C)',
             data: temps,
-            borderColor: '#D85A30',
-            backgroundColor: c.orangeFill,
-            fill: true,
-            tension: 0.35,
-            pointRadius: 2,
-            pointHitRadius: 20,
-            pointBackgroundColor: '#D85A30',
-            borderWidth: 2.5,
-            yAxisID: 'yT'
+            borderColor: '#D85A30', backgroundColor: c.orangeFill,
+            fill: true, tension: 0.35, pointRadius: 0, pointHitRadius: 12,
+            pointBackgroundColor: '#D85A30', borderWidth: 2.5, yAxisID: 'yT'
           },
           {
-            label: 'Vitesse',
+            label: 'Vitesse (\u00b0C/h)',
             data: speeds,
-            borderColor: '#185FA5',
-            backgroundColor: 'transparent',
-            fill: false,
-            tension: 0.35,
-            pointRadius: 2,
-            pointHitRadius: 20,
-            pointBackgroundColor: '#185FA5',
-            borderWidth: 1.5,
-            borderDash: [6, 3],
-            spanGaps: true,
-            yAxisID: 'yS'
+            borderColor: '#185FA5', backgroundColor: 'transparent',
+            fill: false, tension: 0.35, pointRadius: 0, pointHitRadius: 12,
+            pointBackgroundColor: '#185FA5', borderWidth: 1.5,
+            borderDash: [6, 3], spanGaps: false, yAxisID: 'yS'
+          },
+          {
+            label: 'Pression (bar)',
+            data: pressions,
+            borderColor: '#534AB7', backgroundColor: 'rgba(83,74,183,0.08)',
+            fill: false, tension: 0, stepped: 'after', pointRadius: 0, pointHitRadius: 12,
+            pointBackgroundColor: '#534AB7', borderWidth: 1.8,
+            spanGaps: true, hidden: !gazMode, yAxisID: 'yP'
+          },
+          {
+            label: 'Registre (%)',
+            data: registres,
+            borderColor: '#0F6E56', backgroundColor: 'rgba(15,110,86,0.08)',
+            fill: false, tension: 0, stepped: 'after', pointRadius: 0, pointHitRadius: 12,
+            pointBackgroundColor: '#0F6E56', borderWidth: 1.8,
+            borderDash: [3, 3], spanGaps: true, hidden: !gazMode, yAxisID: 'yR'
           }
         ]
       },
       options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        animation: { duration: 300 },
+        responsive: true, maintainAspectRatio: false, animation: { duration: 300 },
         interaction: { mode: 'index', intersect: false },
         plugins: {
           legend: { display: false },
           tooltip: {
-            backgroundColor: 'rgba(26,26,24,0.92)',
-            titleColor: '#fff',
-            bodyColor: '#D3D1C7',
-            padding: 10,
-            cornerRadius: 8,
+            backgroundColor: 'rgba(26,26,24,0.92)', titleColor: '#fff',
+            bodyColor: '#D3D1C7', padding: 10, cornerRadius: 8,
             callbacks: {
               label: function(ctx) {
                 if (ctx.datasetIndex === 0) return '  Temp : ' + Math.round(ctx.parsed.y) + ' \u00b0C';
-                return ctx.parsed.y !== null ? '  Vitesse : ' + Math.round(ctx.parsed.y) + ' \u00b0C/h' : null;
+                if (ctx.datasetIndex === 1) return ctx.parsed.y !== null ? '  Vitesse : ' + Math.round(ctx.parsed.y) + ' \u00b0C/h' : null;
+                if (ctx.datasetIndex === 2) return ctx.parsed.y !== null ? '  Pression : ' + ctx.parsed.y.toFixed(1) + ' bar' : null;
+                if (ctx.datasetIndex === 3) return ctx.parsed.y !== null ? '  Registre : ' + Math.round(ctx.parsed.y) + ' %' : null;
               }
             }
           },
@@ -564,30 +735,49 @@ function renderChart() {
         },
         scales: {
           x: {
-            ticks: { color: c.tick, font: { size: 11 }, autoSkip: true, maxTicksLimit: 7, maxRotation: 35 },
+            type: 'linear',
+            ticks: {
+              color: c.tick, font: { size: 11 }, maxTicksLimit: 8, maxRotation: 0,
+              callback: function(val) { return formatTime(val); }
+            },
             grid: { color: c.grid }
           },
           yT: {
-            type: 'linear',
-            position: 'left',
-            min: 0,
-            max: 1400,
-            ticks: { color: '#D85A30', font: { size: 11 }, stepSize: 200 },
+            type: 'linear', position: 'left', min: chartScales.tempMin, max: chartScales.tempMax,
+            ticks: { color: '#D85A30', font: { size: 9 }, stepSize: 50 },
             grid: { color: c.grid }
           },
           yS: {
-            type: 'linear',
-            position: 'right',
+            type: 'linear', position: 'right', min: chartScales.spdMin, max: chartScales.spdMax,
             ticks: { color: '#185FA5', font: { size: 11 } },
             grid: { drawOnChartArea: false }
+          },
+          yP: {
+            type: 'linear', position: 'left', min: chartScales.presMin, max: chartScales.presMax,
+            display: gazMode,
+            ticks: { color: '#534AB7', font: { size: 9 }, stepSize: 0.1 },
+            grid: { drawOnChartArea: false },
+            offset: true
+          },
+          yR: {
+            type: 'linear', position: 'right', min: chartScales.regMin, max: chartScales.regMax,
+            display: gazMode,
+            ticks: { color: '#0F6E56', font: { size: 10 } },
+            grid: { drawOnChartArea: false },
+            offset: true
           }
         }
       }
     });
   } else {
-    chart.data.labels = labels;
     chart.data.datasets[0].data = temps;
     chart.data.datasets[1].data = speeds;
+    chart.data.datasets[2].data = pressions;
+    chart.data.datasets[3].data = registres;
+    chart.data.datasets[2].hidden = !gazMode;
+    chart.data.datasets[3].hidden = !gazMode;
+    chart.options.scales.yP.display = gazMode;
+    chart.options.scales.yR.display = gazMode;
     chart.update();
   }
 }
@@ -598,7 +788,12 @@ function renderTable() {
     wrap.innerHTML = '<div class="no-data">Aucun relev\u00e9 pour l\'instant</div>';
     return;
   }
-  var html = '<div class="table-header"><span>#</span><span>Temps</span><span>T \u00b0C</span><span>Vit.</span><span></span></div>';
+  var gaz = gazMode;
+  var colClass = gaz ? '' : ' no-gaz';
+  var html = '<div class="table-header' + colClass + '">'
+    + '<span>#</span><span>Temps</span><span>T \u00b0C</span><span>Vit.</span>'
+    + (gaz ? '<span>Bar</span><span>Reg%</span>' : '')
+    + '<span></span></div>';
   var rev = points.slice().reverse();
   for (var ri = 0; ri < rev.length; ri++) {
     var i = points.length - 1 - ri;
@@ -612,11 +807,16 @@ function renderTable() {
       else sh = '<span class="spd-na">0</span>';
     }
     var badge = p.src === 'chrono' ? '<span class="src-badge">\u23f1</span>' : '<span class="src-badge">\u270f</span>';
-    html += '<div class="table-row">'
+    var gazCols = gaz
+      ? '<span>' + (p.pression !== null && p.pression !== undefined ? p.pression.toFixed(1) : '\u2014') + '</span>'
+        + '<span>' + (p.registre !== null && p.registre !== undefined ? Math.round(p.registre) : '\u2014') + '</span>'
+      : '';
+    html += '<div class="table-row' + colClass + '">'
       + '<span class="num">' + (i+1) + '</span>'
       + '<span>' + formatTime(p.time) + badge + '</span>'
       + '<span>' + Math.round(p.temp) + '</span>'
       + '<span>' + sh + '</span>'
+      + gazCols
       + '<button class="btn-del" onclick="deletePoint(' + i + ')">\u00d7</button>'
       + '</div>';
   }
@@ -639,45 +839,52 @@ function exportPDF() {
       var last = points[points.length - 1];
       var sl = calcSpeed(points.length - 1);
 
-      doc.setFillColor(250, 249, 246);
-      doc.rect(0, 0, W, H, 'F');
-
+      doc.setFillColor(250, 249, 246); doc.rect(0, 0, W, H, 'F');
       doc.setFontSize(15); doc.setFont(undefined, 'bold'); doc.setTextColor(30, 30, 28);
       doc.text('Courbe de cuisson Four C\u00e9ramique', M, 14);
       doc.setFontSize(9); doc.setFont(undefined, 'normal'); doc.setTextColor(95, 94, 90);
       doc.text('Cuisson r\u00e9alis\u00e9e le ' + firstDate, M, 20);
       doc.setTextColor(30, 30, 28);
       doc.text(points.length + ' relev\u00e9s  |  Dur\u00e9e : ' + formatTime(last.time)
-        + '  |  Temp. finale : ' + Math.round(last.temp) + ' \u00b0C'
-        + '  |  Vitesse : ' + (sl !== null ? Math.round(sl) + ' \u00b0C/h' : '\u2014'), M, 26);
+        + '  |  Temp. finale : ' + Math.round(last.temp) + '\u00b0C'
+        + '  |  Vitesse : ' + (sl !== null ? Math.round(sl) + '\u00b0C/h' : '\u2014'), M, 26);
       doc.setDrawColor(216, 90, 48); doc.setLineWidth(0.4);
       doc.line(M, 29, W - M, 29);
 
       var gridBefore = chart.options.scales.x.grid.color;
-      chart.options.scales.x.grid.color    = 'rgba(0,0,0,0.75)';
-      chart.options.scales.yT.grid.color   = 'rgba(0,0,0,0.75)';
+      chart.options.scales.x.grid.color   = 'rgba(0,0,0,0.75)';
+      chart.options.scales.yT.grid.color  = 'rgba(0,0,0,0.75)';
       chart.options.scales.x.ticks.font.size  = 7;
       chart.options.scales.yT.ticks.font.size = 7;
       chart.options.scales.yS.ticks.font.size = 7;
+      if (gazMode) { chart.options.scales.yP.ticks.font.size = 7; chart.options.scales.yR.ticks.font.size = 7; }
       chart.update('none');
 
       var chartW = W - 2 * M;
-      var chartH = Math.round(chartW * 0.42);
+      var chartH = Math.round(chartW * 0.45);
       doc.addImage(document.getElementById('myChart').toDataURL('image/png', 0.95), 'PNG', M, 32, chartW, chartH);
 
-      chart.options.scales.x.grid.color    = gridBefore;
-      chart.options.scales.yT.grid.color   = gridBefore;
+      chart.options.scales.x.grid.color   = gridBefore;
+      chart.options.scales.yT.grid.color  = gridBefore;
       chart.options.scales.x.ticks.font.size  = 11;
       chart.options.scales.yT.ticks.font.size = 11;
       chart.options.scales.yS.ticks.font.size = 11;
+      if (gazMode) { chart.options.scales.yP.ticks.font.size = 10; chart.options.scales.yR.ticks.font.size = 10; }
       chart.update('none');
 
       var legendY = 32 + chartH + 4;
-      doc.setFillColor(216, 90, 48); doc.rect(M, legendY, 5, 2.5, 'F');
-      doc.setFontSize(8); doc.setTextColor(50, 50, 48);
-      doc.text('Temp\u00e9rature (\u00b0C)', M + 7, legendY + 2.2);
-      doc.setFillColor(24, 95, 165); doc.rect(M + 44, legendY, 5, 2.5, 'F');
-      doc.text('Vitesse (\u00b0C/h)', M + 51, legendY + 2.2);
+      var lx = M;
+      function pdfLegend(color, label) {
+        doc.setFillColor.apply(doc, color); doc.rect(lx, legendY, 5, 2.5, 'F');
+        doc.setFontSize(8); doc.setTextColor(50, 50, 48); doc.text(label, lx + 7, legendY + 2.2);
+        lx += 44;
+      }
+      pdfLegend([216,90,48], 'Temp\u00e9rature (\u00b0C)');
+      pdfLegend([24,95,165], 'Vitesse (\u00b0C/h)');
+      if (gazMode) {
+        pdfLegend([83,74,183], 'Pression (bar)');
+        pdfLegend([15,110,86], 'Registre (%)');
+      }
 
       var tableY = legendY + 8;
       var rowH = 5.2;
@@ -687,20 +894,19 @@ function exportPDF() {
       var nCols = n <= maxRows ? 1 : n <= maxRows * 2 ? 2 : 3;
       var colWidth = (W - 2 * M) / nCols;
       var perCol = Math.ceil(n / nCols);
-      var headers = ['#', 'Temps', 'T \u00b0C', 'Vit.'];
+      var headers = gazMode ? ['#','Temps','T\u00b0C','Vit.','Bar','Reg%'] : ['#','Temps','T \u00b0C','Vit.'];
+      var fxOffsets = gazMode ? [0,8,22,34,46,56] : [0,8,24,36];
 
-      for (var c = 0; c < nCols; c++) {
-        var cx = M + c * colWidth;
-        var fx = [cx, cx + 8, cx + 24, cx + 36];
+      for (var col = 0; col < nCols; col++) {
+        var cx = M + col * colWidth;
+        var fx = fxOffsets.map(function(o) { return cx + o; });
         doc.setFontSize(6.5); doc.setFont(undefined, 'bold'); doc.setTextColor(95, 94, 90);
-        for (var hi = 0; hi < headers.length; hi++) {
-          doc.text(headers[hi], fx[hi], tableY);
-        }
+        for (var hi = 0; hi < headers.length; hi++) doc.text(headers[hi], fx[hi], tableY);
         doc.setDrawColor(150, 148, 144); doc.setLineWidth(0.25);
         doc.line(cx, tableY + 1.5, cx + colWidth - 2, tableY + 1.5);
         doc.setFont(undefined, 'normal');
         for (var r = 0; r < perCol; r++) {
-          var idx = c * perCol + r;
+          var idx = col * perCol + r;
           if (idx >= n) break;
           var pt = points[idx];
           var spd = calcSpeed(idx);
@@ -714,6 +920,12 @@ function exportPDF() {
           else if (spd !== null && spd < 0) doc.setTextColor(163, 45, 45);
           else doc.setTextColor(95, 94, 90);
           doc.text(ss, fx[3], ry);
+          if (gazMode) {
+            doc.setTextColor(83, 74, 183);
+            doc.text(pt.pression !== null && pt.pression !== undefined ? pt.pression.toFixed(1) : '\u2014', fx[4], ry);
+            doc.setTextColor(15, 110, 86);
+            doc.text(pt.registre !== null && pt.registre !== undefined ? String(Math.round(pt.registre)) : '\u2014', fx[5], ry);
+          }
         }
       }
 
@@ -725,30 +937,87 @@ function exportPDF() {
   }, 100);
 }
 
-/* ── Listeners ── */
-document.getElementById('chrono-temp').addEventListener('input', updateBtn);
-document.getElementById('inp-h').addEventListener('input', updateBtn);
-document.getElementById('inp-m').addEventListener('input', updateBtn);
-document.getElementById('inp-temp').addEventListener('input', updateBtn);
+/* ── Graphique détaillé ── */
 
-document.getElementById('chrono-temp').addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') { e.preventDefault(); enregistrer(); }
+
+/* ── Paramètres graphique ── */
+var chartScales = { tempMin: 0, tempMax: 1400, spdMin: -500, spdMax: 500, presMin: 0, presMax: 1, regMin: 0, regMax: 100 };
+
+function openParamModal() {
+  document.getElementById('p-temp-min').value = chartScales.tempMin;
+  document.getElementById('p-temp-max').value = chartScales.tempMax;
+  document.getElementById('p-spd-min').value  = chartScales.spdMin;
+  document.getElementById('p-spd-max').value  = chartScales.spdMax;
+  document.getElementById('p-pres-min').value = chartScales.presMin;
+  document.getElementById('p-pres-max').value = chartScales.presMax;
+  document.getElementById('p-reg-min').value  = chartScales.regMin;
+  document.getElementById('p-reg-max').value  = chartScales.regMax;
+  var active = gazMode ? 'active' : '';
+  document.getElementById('p-row-pression').className = 'param-row param-row-gaz ' + active;
+  document.getElementById('p-row-registre').className = 'param-row param-row-gaz ' + active;
+  document.getElementById('param-overlay').classList.add('open');
+}
+
+function closeParamModal() {
+  document.getElementById('param-overlay').classList.remove('open');
+}
+
+function closeParamIfOutside(e) {
+  if (e.target === document.getElementById('param-overlay')) closeParamModal();
+}
+
+function applyParamModal() {
+  var tMin = parseFloat(document.getElementById('p-temp-min').value);
+  var tMax = parseFloat(document.getElementById('p-temp-max').value);
+  var sMin = parseFloat(document.getElementById('p-spd-min').value);
+  var sMax = parseFloat(document.getElementById('p-spd-max').value);
+  var pMin = parseFloat(document.getElementById('p-pres-min').value);
+  var pMax = parseFloat(document.getElementById('p-pres-max').value);
+  var rMin = parseFloat(document.getElementById('p-reg-min').value);
+  var rMax = parseFloat(document.getElementById('p-reg-max').value);
+  if (!isNaN(tMin) && !isNaN(tMax) && tMax > tMin) { chartScales.tempMin = tMin; chartScales.tempMax = tMax; }
+  if (!isNaN(sMin) && !isNaN(sMax) && sMax > sMin) { chartScales.spdMin = sMin; chartScales.spdMax = sMax; }
+  if (!isNaN(pMin) && !isNaN(pMax) && pMax > pMin) { chartScales.presMin = pMin; chartScales.presMax = pMax; }
+  if (!isNaN(rMin) && !isNaN(rMax) && rMax > rMin) { chartScales.regMin = rMin; chartScales.regMax = rMax; }
+  if (chart) {
+    chart.options.scales.yT.min = chartScales.tempMin;
+    chart.options.scales.yT.max = chartScales.tempMax;
+    chart.options.scales.yS.min = chartScales.spdMin;
+    chart.options.scales.yS.max = chartScales.spdMax;
+    chart.options.scales.yP.min = chartScales.presMin;
+    chart.options.scales.yP.max = chartScales.presMax;
+    chart.options.scales.yR.min = chartScales.regMin;
+    chart.options.scales.yR.max = chartScales.regMax;
+    chart.update();
+  }
+  closeParamModal();
+  showToast('Échelles mises à jour');
+}
+
+/* ── Listeners ── */
+['chrono-temp','chrono-pression','chrono-registre','inp-h','inp-m','inp-temp','inp-pression','inp-registre'].forEach(function(id) {
+  var el = document.getElementById(id);
+  if (el) el.addEventListener('input', updateBtn);
 });
-document.getElementById('inp-h').addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') { e.preventDefault(); document.getElementById('inp-m').focus(); }
-});
-document.getElementById('inp-m').addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') { e.preventDefault(); document.getElementById('inp-temp').focus(); }
-});
-document.getElementById('inp-temp').addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') { e.preventDefault(); enregistrer(); }
-});
-document.getElementById('set-m').addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') { e.preventDefault(); setChronoTime(); }
-});
+document.getElementById('chrono-temp').addEventListener('keydown', function(e) { if (e.key==='Enter') { e.preventDefault(); enregistrer(); } });
+document.getElementById('inp-h').addEventListener('keydown', function(e) { if (e.key==='Enter') { e.preventDefault(); document.getElementById('inp-m').focus(); } });
+document.getElementById('inp-m').addEventListener('keydown', function(e) { if (e.key==='Enter') { e.preventDefault(); document.getElementById('inp-temp').focus(); } });
+document.getElementById('inp-temp').addEventListener('keydown', function(e) { if (e.key==='Enter') { e.preventDefault(); enregistrer(); } });
+document.getElementById('set-m').addEventListener('keydown', function(e) { if (e.key==='Enter') { e.preventDefault(); setChronoTime(); } });
 
 /* ── Init ── */
 loadStorage();
+
+if (gazMode) {
+  document.getElementById('gaz-toggle').checked = true;
+  document.getElementById('chrono-gaz-fields').classList.add('visible');
+  document.getElementById('manual-gaz-fields').classList.add('visible');
+  updateLegend();
+  document.getElementById('chrono-pression').value = lastPression;
+  document.getElementById('chrono-registre').value = lastRegistre;
+  document.getElementById('inp-pression').value = lastPression;
+  document.getElementById('inp-registre').value = lastRegistre;
+}
 
 if (chronoRunning) {
   document.getElementById('btn-start').textContent = 'Pause';
