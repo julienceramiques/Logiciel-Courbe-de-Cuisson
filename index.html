@@ -353,8 +353,13 @@ body { padding: 0 0 40px 0; }
     <button class="btn-capture" id="btn-capture" onclick="enregistrer()" disabled>Enregistrer le relev&eacute;</button>
 
     <div class="divider"></div>
-    <div class="btn-row">
-      <button class="btn-secondary btn-pdf" onclick="exportPDF()">Exporter PDF</button>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px">
+      <button class="btn-secondary btn-pdf" onclick="exportPDF()">PDF</button>
+      <button class="btn-secondary" style="background:var(--green-bg);color:var(--green);border-color:rgba(59,109,17,0.25)" onclick="exportCSV()">CSV</button>
+      <button class="btn-secondary" style="background:var(--blue-bg);color:var(--blue);border-color:rgba(24,95,165,0.25)" onclick="exportPNG()">PNG</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+      <button class="btn-secondary" style="background:var(--amber-bg);color:var(--amber);border-color:rgba(186,117,23,0.25)" onclick="exportHTML()">HTML</button>
       <button class="btn-secondary" onclick="clearAll()">Tout effacer</button>
     </div>
   </div>
@@ -1021,6 +1026,124 @@ function applyParamModal() {
   closeParamModal();
   showToast('Échelles mises à jour');
 }
+
+
+/* ── Utilitaire téléchargement ── */
+function downloadFile(data, mimeType, filename, isDataUrl) {
+  var a = document.createElement('a');
+  if (isDataUrl) { a.href = data; }
+  else { var blob = new Blob([data], { type: mimeType }); a.href = URL.createObjectURL(blob); }
+  a.download = filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  if (!isDataUrl) URL.revokeObjectURL(a.href);
+}
+
+/* ── Export CSV ── */
+function exportCSV() {
+  if (!points.length) { showToast('Aucun relev\u00e9 \u00e0 exporter'); return; }
+  var header = gazMode
+    ? '#,Temps,Duree (h),T\u00b0C,Vitesse (dC/h),Pression (bar),Registre (%),Source'
+    : '#,Temps,Duree (h),T\u00b0C,Vitesse (dC/h),Source';
+  var rows = [header];
+  points.forEach(function(p, i) {
+    var spd = calcSpeed(i);
+    var row = [i+1, formatTime(p.time), p.time.toFixed(4), Math.round(p.temp), spd !== null ? Math.round(spd) : ''];
+    if (gazMode) {
+      row.push(p.pression !== null && p.pression !== undefined ? p.pression : '');
+      row.push(p.registre !== null && p.registre !== undefined ? Math.round(p.registre) : '');
+    }
+    row.push(p.src === 'chrono' ? 'chrono' : 'manuel');
+    rows.push(row.join(','));
+  });
+  var now = new Date();
+  downloadFile(rows.join('\n'), 'text/csv;charset=utf-8', 'cuisson-' + now.toISOString().slice(0,10) + '.csv');
+  showToast('CSV export\u00e9 !');
+}
+
+/* ── Export PNG ── */
+function exportPNG() {
+  if (!points.length) { showToast('Aucun relev\u00e9 \u00e0 exporter'); return; }
+  var gridBefore = chart.options.scales.x.grid.color;
+  chart.options.scales.x.grid.color = 'rgba(0,0,0,0.75)';
+  chart.options.scales.yT.grid.color = 'rgba(0,0,0,0.75)';
+  chart.update('none');
+  var dataUrl = document.getElementById('myChart').toDataURL('image/png', 1.0);
+  chart.options.scales.x.grid.color = gridBefore;
+  chart.options.scales.yT.grid.color = gridBefore;
+  chart.update('none');
+  var now = new Date();
+  downloadFile(dataUrl, null, 'cuisson-' + now.toISOString().slice(0,10) + '.png', true);
+  showToast('PNG export\u00e9 !');
+}
+
+/* ── Export HTML autonome ── */
+function exportHTML() {
+  if (!points.length) { showToast('Aucun relev\u00e9 \u00e0 exporter'); return; }
+  showToast('G\u00e9n\u00e9ration HTML\u2026');
+  setTimeout(function() {
+    var now = new Date();
+    var firstDate = (points[0] && points[0].date)
+      ? new Date(points[0].date).toLocaleDateString('fr-FR') : now.toLocaleDateString('fr-FR');
+    var last = points[points.length - 1];
+    var sl = calcSpeed(points.length - 1);
+
+    var tableRows = '';
+    points.forEach(function(p, i) {
+      var spd = calcSpeed(i);
+      var ss = spd !== null ? (spd > 0 ? '+' : '') + Math.round(spd) : '\u2014';
+      var sc = spd !== null && spd > 0 ? '#3B6D11' : spd !== null && spd < 0 ? '#A32D2D' : '#888';
+      var gz = gazMode
+        ? '<td style="padding:6px 10px;border-bottom:1px solid #eee;color:#534AB7">' + (p.pression != null ? p.pression.toFixed(1) : '\u2014') + '</td>'
+          + '<td style="padding:6px 10px;border-bottom:1px solid #eee;color:#0F6E56">' + (p.registre != null ? Math.round(p.registre) : '\u2014') + '</td>'
+        : '';
+      tableRows += '<tr><td style="padding:6px 10px;border-bottom:1px solid #eee;color:#888">' + (i+1) + '</td>'
+        + '<td style="padding:6px 10px;border-bottom:1px solid #eee">' + formatTime(p.time) + '</td>'
+        + '<td style="padding:6px 10px;border-bottom:1px solid #eee;color:#D85A30;font-weight:600">' + Math.round(p.temp) + '</td>'
+        + '<td style="padding:6px 10px;border-bottom:1px solid #eee;color:' + sc + ';font-weight:600">' + ss + '</td>'
+        + gz + '<td style="padding:6px 10px;border-bottom:1px solid #eee;color:#888;font-size:12px">' + (p.src === 'chrono' ? '\u23f1' : '\u270f') + '</td></tr>';
+    });
+
+    var gazTh = gazMode ? '<th style="padding:8px 10px;background:#f5f4f1;font-size:12px;color:#888">Pression</th><th style="padding:8px 10px;background:#f5f4f1;font-size:12px;color:#888">Registre</th>' : '';
+    var dataJSON = JSON.stringify(points.map(function(p, i) {
+      var s = calcSpeed(i); return { t: p.time, temp: p.temp, spd: s !== null ? parseFloat(s.toFixed(1)) : null, pr: p.pression || null, rg: p.registre || null };
+    }));
+    var gazDS = gazMode
+      ? 'var pr=d.map(function(p){return{x:p.t,y:p.pr};});var rg=d.map(function(p){return{x:p.t,y:p.rg};});ds.push({label:"Pr",data:pr,borderColor:"#534AB7",fill:false,tension:0,stepped:"after",pointRadius:0,pointHitRadius:15,borderWidth:1.8,yAxisID:"yP"});ds.push({label:"Rg",data:rg,borderColor:"#0F6E56",fill:false,tension:0,stepped:"after",pointRadius:0,pointHitRadius:15,borderWidth:1.8,borderDash:[3,3],yAxisID:"yR"});'
+      : '';
+    var gazSc = gazMode
+      ? ',yP:{type:"linear",position:"left",min:0,max:1,ticks:{color:"#534AB7",stepSize:0.1},grid:{drawOnChartArea:false}},yR:{type:"linear",position:"right",min:0,max:100,ticks:{color:"#0F6E56"},grid:{drawOnChartArea:false}}'
+      : '';
+
+    var L = [];
+    L.push('<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">');
+    L.push('<title>Cuisson ' + firstDate + '</title>');
+    L.push('<style>body{font-family:-apple-system,sans-serif;margin:0;padding:20px;background:#f5f4f1;color:#1a1a18}h1{font-size:20px;font-weight:600;margin-bottom:4px}.meta{font-size:13px;color:#888;margin-bottom:20px}.card{background:#fff;border:.5px solid rgba(0,0,0,.12);border-radius:12px;padding:20px;margin-bottom:16px}table{width:100%;border-collapse:collapse}th{text-align:left}</style>');
+    L.push('</' + 'head><body>');
+    L.push('<h1>Courbe de cuisson Four C\u00e9ramique</h1>');
+    L.push('<div class="meta">Cuisson du ' + firstDate + ' &nbsp;|&nbsp; ' + points.length + ' relev\u00e9s &nbsp;|&nbsp; Dur\u00e9e\u00a0: ' + formatTime(last.time) + ' &nbsp;|&nbsp; Temp. finale\u00a0: ' + Math.round(last.temp) + '\u00b0C' + (sl !== null ? ' &nbsp;|&nbsp; Vitesse\u00a0: ' + Math.round(sl) + '\u00b0C/h' : '') + '</div>');
+    L.push('<div class="card"><div style="position:relative;height:420px"><canvas id="c"></canvas></div></div>');
+    L.push('<div class="card"><table><thead><tr><th style="padding:8px 10px;background:#f5f4f1;font-size:12px;color:#888">#</th><th style="padding:8px 10px;background:#f5f4f1;font-size:12px;color:#888">Temps</th><th style="padding:8px 10px;background:#f5f4f1;font-size:12px;color:#888">T\u00a0\u00b0C</th><th style="padding:8px 10px;background:#f5f4f1;font-size:12px;color:#888">Vit.\u00a0\u00b0C/h</th>' + gazTh + '<th style="padding:8px 10px;background:#f5f4f1;font-size:12px;color:#888">Source</th></tr></thead><tbody>' + tableRows + '</tbody></table></div>');
+    L.push('<p style="font-size:11px;color:#aaa;text-align:center">julienceramiques@gmail.com</p>');
+    L.push('<' + 'script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"><' + '/script>');
+    L.push('<' + 'script>');
+    L.push('(function(){');
+    L.push('var d=' + dataJSON + ';');
+    L.push('var t=d.map(function(p){return{x:p.t,y:p.temp};});');
+    L.push('var s=d.map(function(p){return{x:p.t,y:p.spd};});');
+    L.push('function f(h){var hr=Math.floor(h),mn=Math.round((h-hr)*60);return hr+"h"+(mn<10?"0":"")+mn;}');
+    L.push('var ds=[{label:"T\u00b0C",data:t,borderColor:"#D85A30",backgroundColor:"rgba(216,90,48,.1)",fill:true,tension:.35,pointRadius:0,pointHitRadius:15,borderWidth:2.5,yAxisID:"yT"},{label:"Vit",data:s,borderColor:"#185FA5",fill:false,tension:.35,pointRadius:0,pointHitRadius:15,borderWidth:1.5,borderDash:[6,3],spanGaps:false,yAxisID:"yS"}];');
+    L.push(gazDS);
+    L.push('var sc={x:{type:"linear",ticks:{callback:function(v){return f(v);}},grid:{color:"rgba(0,0,0,.45)"}},yT:{type:"linear",position:"left",min:0,max:1400,ticks:{color:"#D85A30",stepSize:50},grid:{color:"rgba(0,0,0,.45)"}},yS:{type:"linear",position:"right",ticks:{color:"#185FA5"},grid:{drawOnChartArea:false}}' + gazSc + '};');
+    L.push('new Chart(document.getElementById("c"),{type:"line",data:{datasets:ds},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:"index",intersect:false},plugins:{legend:{display:true}},scales:sc}});');
+    L.push('})();');
+    L.push('<' + '/script>');
+    L.push('</body></html>');
+
+    downloadFile(L.join('\n'), 'text/html;charset=utf-8', 'cuisson-' + now.toISOString().slice(0,10) + '.html');
+    showToast('HTML export\u00e9 !');
+  }, 100);
+}
+
 
 /* ── Listeners ── */
 ['chrono-temp','chrono-pression','chrono-registre','inp-h','inp-m','inp-temp','inp-pression','inp-registre'].forEach(function(id) {
