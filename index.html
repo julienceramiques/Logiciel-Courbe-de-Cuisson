@@ -266,6 +266,13 @@ body { padding: 0 0 40px 0; }
             <span>secondes</span>
           </div>
         </div>
+        <div class="param-row">
+          <div class="param-label"><div class="param-label-dot" style="background:#888780"></div>Hauteur graphique</div>
+          <div class="param-inputs">
+            <input type="number" id="p-chart-height" inputmode="numeric" placeholder="340" value="340" min="150" max="800" step="10" />
+            <span>px</span>
+          </div>
+        </div>
         <button class="btn-param-apply" onclick="applyParamModal()">Appliquer</button>
       </div>
     </div>
@@ -353,14 +360,14 @@ body { padding: 0 0 40px 0; }
     <button class="btn-capture" id="btn-capture" onclick="enregistrer()" disabled>Enregistrer le relev&eacute;</button>
 
     <div class="divider"></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px">
-      <button class="btn-secondary btn-pdf" onclick="exportPDF()">PDF</button>
-      <button class="btn-secondary" style="background:var(--green-bg);color:var(--green);border-color:rgba(59,109,17,0.25)" onclick="exportCSV()">CSV</button>
-      <button class="btn-secondary" style="background:var(--blue-bg);color:var(--blue);border-color:rgba(24,95,165,0.25)" onclick="exportPNG()">PNG</button>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-top:12px">
+      <button class="btn-secondary" style="padding:9px 4px;font-size:12px;background:var(--amber-bg);color:var(--amber);border-color:rgba(186,117,23,0.25)" onclick="exportHTML()">HTML</button>
+      <button class="btn-secondary btn-pdf" style="padding:9px 4px;font-size:12px" onclick="exportPDF()">PDF</button>
+      <button class="btn-secondary" style="padding:9px 4px;font-size:12px;background:var(--green-bg);color:var(--green);border-color:rgba(59,109,17,0.25)" onclick="exportCSV()">CSV</button>
+      <button class="btn-secondary" style="padding:9px 4px;font-size:12px;background:var(--blue-bg);color:var(--blue);border-color:rgba(24,95,165,0.25)" onclick="exportPNG()">PNG</button>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
-      <button class="btn-secondary" style="background:var(--amber-bg);color:var(--amber);border-color:rgba(186,117,23,0.25)" onclick="exportHTML()">HTML</button>
-      <button class="btn-secondary" onclick="clearAll()">Tout effacer</button>
+    <div style="margin-top:8px">
+      <button class="btn-secondary" style="width:100%" onclick="clearAll()">Tout effacer</button>
     </div>
   </div>
 </div>
@@ -963,7 +970,7 @@ function exportPDF() {
 
 
 /* ── Paramètres graphique ── */
-var chartScales = { tempMin: 0, tempMax: 1400, spdMin: -500, spdMax: 500, presMin: 0, presMax: 1, regMin: 0, regMax: 100, timeMin: undefined, timeMax: undefined, tooltipDelay: 4000 };
+var chartScales = { tempMin: 0, tempMax: 1400, spdMin: -500, spdMax: 500, presMin: 0, presMax: 1, regMin: 0, regMax: 100, timeMin: undefined, timeMax: undefined, tooltipDelay: 4000, chartHeight: 340 };
 
 function openParamModal() {
   document.getElementById('p-temp-min').value = chartScales.tempMin;
@@ -977,6 +984,7 @@ function openParamModal() {
   document.getElementById('p-time-min').value = chartScales.timeMin !== undefined ? chartScales.timeMin : '';
   document.getElementById('p-time-max').value = chartScales.timeMax !== undefined ? chartScales.timeMax : '';
   document.getElementById('p-tooltip-sec').value = chartScales.tooltipDelay / 1000;
+  document.getElementById('p-chart-height').value = chartScales.chartHeight;
   var active = gazMode ? 'active' : '';
   document.getElementById('p-row-pression').className = 'param-row param-row-gaz ' + active;
   document.getElementById('p-row-registre').className = 'param-row param-row-gaz ' + active;
@@ -1010,6 +1018,12 @@ function applyParamModal() {
   chartScales.timeMax = tMaxRaw !== '' ? parseFloat(tMaxRaw) : undefined;
   var tooltipSec = parseFloat(document.getElementById('p-tooltip-sec').value);
   if (!isNaN(tooltipSec) && tooltipSec >= 1) chartScales.tooltipDelay = Math.round(tooltipSec * 1000);
+  var chartH = parseInt(document.getElementById('p-chart-height').value);
+  if (!isNaN(chartH) && chartH >= 150 && chartH <= 800) {
+    chartScales.chartHeight = chartH;
+    document.querySelector('.chart-wrap').style.height = chartH + 'px';
+    if (chart) { chart.resize(); }
+  }
   if (chart) {
     chart.options.scales.yT.min = chartScales.tempMin;
     chart.options.scales.yT.max = chartScales.tempMax;
